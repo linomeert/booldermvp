@@ -1,10 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
 import * as api from "../api";
 import { FeedItemCard } from "../components/FeedItemCard";
 import { SessionCard } from "../components/SessionCard";
 import { FloatingActionButton } from "../components/FloatingActionButton";
-import { useAuth } from "../context/AuthContext";
 import type { Climb, Session } from "../types";
 
 type FeedItem =
@@ -12,8 +10,6 @@ type FeedItem =
   | { type: "session"; data: Session };
 
 export const FeedPage = () => {
-  const { user: currentUser } = useAuth();
-
   const { data: climbs, isLoading: climbsLoading } = useQuery({
     queryKey: ["feed"],
     queryFn: api.getFeed,
@@ -52,12 +48,12 @@ export const FeedPage = () => {
     const dateA = new Date(
       a.type === "climb"
         ? a.data.createdAt
-        : a.data.startedAt || a.data.endedAt || a.data.createdAt
+        : a.data.startedAt || a.data.endedAt || ""
     ).getTime();
     const dateB = new Date(
       b.type === "climb"
         ? b.data.createdAt
-        : b.data.startedAt || b.data.endedAt || b.data.createdAt
+        : b.data.startedAt || b.data.endedAt || ""
     ).getTime();
     return dateB - dateA;
   });
