@@ -304,14 +304,21 @@ export const getSessionById = async (
     // Transform gymId/cragId to gym/crag for frontend
     const transformedClimbs = climbs.map((climb: any) => ({
       ...climb,
+      id: climb._id.toString(),
       gym: climb.gymId,
       crag: climb.cragId,
+      gymId: climb.gymId?._id?.toString() || climb.gymId,
+      cragId: climb.cragId?._id?.toString() || climb.cragId,
+      sessionId: climb.sessionId?.toString() || climb.sessionId,
     }));
 
     const transformedSession = {
       ...session,
+      id: session._id.toString(),
       gym: session.gymId,
       crag: session.cragId,
+      gymId: session.gymId?._id?.toString() || session.gymId,
+      cragId: session.cragId?._id?.toString() || session.cragId,
       climbs: transformedClimbs
     };
 

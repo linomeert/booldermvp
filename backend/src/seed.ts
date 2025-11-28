@@ -53,7 +53,7 @@ async function main() {
     country: 'Netherlands',
   });
 
-  const gym4 = await Gym.create({
+  await Gym.create({
     name: 'Petit ile',
     city: 'Réunion',
     country: 'France',

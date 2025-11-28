@@ -19,8 +19,10 @@ export const getSessionComments = async (
     // Transform userId to user for frontend
     const transformedComments = comments.map((comment: any) => ({
       ...comment,
+      id: comment._id.toString(),
       user: comment.userId,
-      userId: comment.userId._id || comment.userId,
+      userId: comment.userId?._id?.toString() || comment.userId,
+      sessionId: comment.sessionId?.toString() || comment.sessionId,
     }));
 
     res.json(transformedComments);
