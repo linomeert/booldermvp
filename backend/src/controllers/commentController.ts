@@ -1,6 +1,8 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { Comment } from '../models/Comment';
+import { Session } from '../models/Session';
+import { Notification } from '../models/Notification';
 
 export const getSessionComments = async (
   req: AuthRequest,
@@ -58,6 +60,18 @@ export const createComment = async (
       user: (populatedComment as any).userId,
       userId: ((populatedComment as any).userId._id || (populatedComment as any).userId),
     };
+
+    // Create notification for session owner (if not commenting on own session)
+    const session = await Session.findById(sessionId);
+    if (session && session.userId.toString() !== userId) {
+      await Notification.create({
+        userId: session.userId,
+        type: 'comment',
+        fromUserId: userId,
+        sessionId: session._id,
+        commentId: comment._id,
+      });
+    }
 
     res.status(201).json(transformedComment);
   } catch (error) {

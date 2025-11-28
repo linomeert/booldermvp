@@ -5,6 +5,7 @@ import { User } from './models/User';
 import { Session } from './models/Session';
 import { Climb } from './models/Climb';
 import { Friendship } from './models/Friendship';
+import { Notification } from './models/Notification';
 import { config } from './config/config';
 
 const grades = ['V0', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10'];
@@ -29,6 +30,7 @@ async function main() {
   await Session.deleteMany({});
   await Climb.deleteMany({});
   await Friendship.deleteMany({});
+  await Notification.deleteMany({});
   await Gym.deleteMany({});
   await Crag.deleteMany({});
 
@@ -72,42 +74,43 @@ async function main() {
     { type: 'outdoor', id: crag2._id },
   ];
 
-  // Create 10 users
+  // Create 10 users with local avatars
   const password = await bcrypt.hash('password123', 10);
   const userNames = [
-    { name: 'Alex Johnson', username: 'alexj' },
-    { name: 'Sam Rivera', username: 'samr' },
-    { name: 'Jordan Chen', username: 'jordanc' },
-    { name: 'Taylor Smith', username: 'taylors' },
-    { name: 'Morgan Lee', username: 'morganl' },
-    { name: 'Casey Brown', username: 'caseyb' },
-    { name: 'Riley Davis', username: 'rileyd' },
-    { name: 'Avery Wilson', username: 'averyw' },
-    { name: 'Quinn Martinez', username: 'quinnm' },
-    { name: 'Jamie Garcia', username: 'jamieg' },
+    { name: 'Alex Johnson', username: 'alexj', gender: 'male', avatarNum: 5 },
+    { name: 'Sam Rivera', username: 'samr', gender: 'female', avatarNum: 3 },
+    { name: 'Jordan Chen', username: 'jordanc', gender: 'male', avatarNum: 7 },
+    { name: 'Taylor Smith', username: 'taylors', gender: 'female', avatarNum: 4 },
+    { name: 'Morgan Lee', username: 'morganl', gender: 'male', avatarNum: 8 },
+    { name: 'Casey Brown', username: 'caseyb', gender: 'female', avatarNum: 6 },
+    { name: 'Riley Davis', username: 'rileyd', gender: 'male', avatarNum: 9 },
+    { name: 'Avery Wilson', username: 'averyw', gender: 'female', avatarNum: 10 },
+    { name: 'Quinn Martinez', username: 'quinnm', gender: 'male', avatarNum: 11 },
+    { name: 'Jamie Garcia', username: 'jamieg', gender: 'female', avatarNum: 12 },
   ];
 
   const users = [];
   for (const userData of userNames) {
+    const avatarPath = userData.gender === 'male' ? 'users-male' : 'users-female';
     const user = await User.create({
       name: userData.name,
       username: userData.username,
       email: `${userData.username}@example.com`,
       password,
-      avatarUrl: `https://avatar.iran.liara.run/public?username=${userData.username}`,
+      avatarUrl: `http://localhost:3001/avatars/${avatarPath}/uifaces-popular-avatar (${userData.avatarNum}).jpg`,
     });
     users.push(user);
   }
 
   console.log('✅ Created 10 users');
 
-  // Create friendships between first 5 users
+  // Create accepted friendships between first 5 users
   const friendGroup = users.slice(0, 5);
   for (let i = 0; i < friendGroup.length; i++) {
     for (let j = i + 1; j < friendGroup.length; j++) {
       await Friendship.create([
-        { userId: friendGroup[i]._id, friendId: friendGroup[j]._id },
-        { userId: friendGroup[j]._id, friendId: friendGroup[i]._id },
+        { userId: friendGroup[i]._id, friendId: friendGroup[j]._id, status: 'accepted' },
+        { userId: friendGroup[j]._id, friendId: friendGroup[i]._id, status: 'accepted' },
       ]);
     }
   }

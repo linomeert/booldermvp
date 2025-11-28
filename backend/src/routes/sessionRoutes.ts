@@ -4,6 +4,7 @@ import {
   createSession,
   endSession,
   getMySessions,
+  getUserSessions,
   getFeedSessions,
   getSessionById,
   deleteSession,
@@ -20,6 +21,7 @@ router.post('/:id/fistbump', authMiddleware, fistbumpSession);
 router.post('/:id/participants', authMiddleware, addParticipant);
 router.delete('/:id/participants/:friendId', authMiddleware, removeParticipant);
 router.get('/me', authMiddleware, getMySessions);
+router.get('/user/:username', getUserSessions);
 router.get('/feed', authMiddleware, getFeedSessions);
 router.get('/:id', getSessionById);
 router.delete('/:id', authMiddleware, deleteSession);

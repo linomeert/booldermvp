@@ -5,13 +5,18 @@ import {
   removeFriend,
   getFriends,
   checkFriendship,
+  acceptFriendRequest,
+  rejectFriendRequest,
 } from '../controllers/friendController';
 
 const router = Router();
 
+// More specific routes must come before generic ones
+router.post('/:friendId/accept', authMiddleware, acceptFriendRequest);
+router.post('/:friendId/reject', authMiddleware, rejectFriendRequest);
+router.get('/check/:friendId', authMiddleware, checkFriendship);
+router.get('/', authMiddleware, getFriends);
 router.post('/:friendId', authMiddleware, addFriend);
 router.delete('/:friendId', authMiddleware, removeFriend);
-router.get('/', authMiddleware, getFriends);
-router.get('/check/:friendId', authMiddleware, checkFriendship);
 
 export default router;

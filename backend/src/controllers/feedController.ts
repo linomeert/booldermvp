@@ -10,8 +10,11 @@ export const getFeed = async (
   try {
     const userId = req.userId!;
 
-    // Get user's friends
-    const friendships = await Friendship.find({ userId }).select('friendId');
+    // Get user's accepted friends only
+    const friendships = await Friendship.find({ 
+      userId,
+      status: 'accepted'
+    }).select('friendId');
     const friendIds = friendships.map((f) => f.friendId);
 
     // Include user's own ID to show their climbs too

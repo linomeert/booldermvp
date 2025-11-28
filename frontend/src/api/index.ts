@@ -6,6 +6,7 @@ import type {
   Gym,
   Crag,
   Comment,
+  Notification,
   AuthResponse,
   CreateClimbRequest,
   CreateSessionRequest,
@@ -56,6 +57,8 @@ export const createSession = (data: CreateSessionRequest) =>
 export const endSession = (id: string) =>
   apiPatch<Session>(`/sessions/${id}/end`);
 export const getMySessions = () => apiGet<Session[]>('/sessions/me');
+export const getUserSessions = (username: string) =>
+  apiGet<Session[]>(`/sessions/user/${username}`);
 export const getFeedSessions = () => apiGet<Session[]>('/sessions/feed');
 export const getSessionById = (id: string) =>
   apiGet<Session>(`/sessions/${id}`);
@@ -78,11 +81,15 @@ export const getCrags = () => apiGet<Crag[]>('/locations/crags');
 // Friends
 export const addFriend = (friendId: string) =>
   apiPost<{ message: string }>(`/friends/${friendId}`, {});
+export const acceptFriendRequest = (friendId: string) =>
+  apiPost<{ message: string }>(`/friends/${friendId}/accept`, {});
+export const rejectFriendRequest = (friendId: string) =>
+  apiPost<{ message: string }>(`/friends/${friendId}/reject`, {});
 export const removeFriend = (friendId: string) =>
   apiDelete<{ message: string }>(`/friends/${friendId}`);
 export const getFriends = () => apiGet<User[]>('/friends');
 export const checkFriendship = (friendId: string) =>
-  apiGet<{ isFriend: boolean }>(`/friends/check/${friendId}`);
+  apiGet<{ isFriend: boolean; status: string | null }>(`/friends/check/${friendId}`);
 
 // Comments
 export const getSessionComments = (sessionId: string) =>
@@ -91,3 +98,13 @@ export const createComment = (sessionId: string, text: string) =>
   apiPost<Comment>(`/sessions/${sessionId}/comments`, { text });
 export const deleteComment = (commentId: string) =>
   apiDelete<{ message: string }>(`/comments/${commentId}`);
+
+// Notifications
+export const getNotifications = () =>
+  apiGet<Notification[]>('/notifications');
+export const markNotificationAsRead = (id: string) =>
+  apiPatch<Notification>(`/notifications/${id}/read`);
+export const markAllNotificationsAsRead = () =>
+  apiPatch<{ count: number }>('/notifications/read-all');
+export const deleteNotification = (id: string) =>
+  apiDelete<{ message: string }>(`/notifications/${id}`);

@@ -56,9 +56,13 @@ export const ProfilePage = () => {
   });
 
   const { data: sessions } = useQuery({
-    queryKey: ["sessions", user?.id],
-    queryFn: api.getMySessions,
-    enabled: !!user && (activeTab === "sessions" || activeTab === "coach"),
+    queryKey: ["sessions", username],
+    queryFn: () =>
+      isOwnProfile ? api.getMySessions() : api.getUserSessions(username!),
+    enabled:
+      !!user &&
+      !!username &&
+      (activeTab === "sessions" || activeTab === "coach"),
   });
 
   const { data: friends } = useQuery({
@@ -108,6 +112,7 @@ export const ProfilePage = () => {
   }
 
   const isFriend = friendshipStatus?.isFriend || false;
+  const isPending = friendshipStatus?.status === "pending";
 
   const tabs = isOwnProfile
     ? [
@@ -126,6 +131,7 @@ export const ProfilePage = () => {
       ];
 
   const handleFriendAction = () => {
+    if (isPending) return; // Don't allow action if pending
     if (isFriend) {
       removeFriendMutation.mutate(user!.id);
     } else {
@@ -142,15 +148,23 @@ export const ProfilePage = () => {
             <button
               onClick={handleFriendAction}
               disabled={
-                addFriendMutation.isPending || removeFriendMutation.isPending
+                addFriendMutation.isPending ||
+                removeFriendMutation.isPending ||
+                isPending
               }
               className={`px-6 py-2 rounded-lg font-medium ${
                 isFriend
                   ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  : isPending
+                  ? "bg-yellow-100 text-yellow-800 cursor-not-allowed"
                   : "bg-primary-600 text-white hover:bg-primary-700"
               } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              {isFriend ? "Remove Friend" : "Add Friend"}
+              {isFriend
+                ? "Remove Friend"
+                : isPending
+                ? "Request Pending"
+                : "Add Friend"}
             </button>
           </div>
         )}

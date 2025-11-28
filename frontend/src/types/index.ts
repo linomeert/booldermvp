@@ -82,6 +82,18 @@ export interface Comment {
   updatedAt: string;
 }
 
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'friend_request' | 'fistbump' | 'comment';
+  fromUserId: string;
+  fromUser?: User;
+  sessionId?: string;
+  commentId?: string;
+  read: boolean;
+  createdAt: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;

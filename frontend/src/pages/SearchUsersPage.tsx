@@ -4,6 +4,69 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as api from "../api";
 import type { User } from "../types";
 
+const UserSearchResult = ({
+  user,
+  isFriend,
+  onAddFriend,
+  onNavigate,
+  isAddingFriend,
+}: {
+  user: User;
+  isFriend: boolean;
+  onAddFriend: (userId: string) => void;
+  onNavigate: () => void;
+  isAddingFriend: boolean;
+}) => {
+  const { data: friendshipStatus } = useQuery({
+    queryKey: ["friendship", user.id],
+    queryFn: () => api.checkFriendship(user.id),
+  });
+
+  const isPending = friendshipStatus?.status === "pending";
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between hover:shadow-lg transition-shadow">
+      <button
+        onClick={onNavigate}
+        className="flex items-center space-x-3 flex-1"
+      >
+        <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
+          {user.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt={user.name}
+              className="w-full h-full rounded-full object-cover"
+            />
+          ) : (
+            <span className="text-2xl">👤</span>
+          )}
+        </div>
+        <div className="text-left">
+          <div className="font-semibold text-gray-900">{user.name}</div>
+          <div className="text-sm text-gray-600">@{user.username}</div>
+        </div>
+      </button>
+      {isFriend ? (
+        <span className="px-4 py-2 bg-green-100 text-green-800 rounded-lg font-medium">
+          Friends ✓
+        </span>
+      ) : isPending ? (
+        <span className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg font-medium cursor-not-allowed">
+          Request Pending
+        </span>
+      ) : (
+        <button
+          onClick={() => onAddFriend(user.id)}
+          disabled={isAddingFriend}
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Add Friend
+        </button>
+      )}
+    </div>
+  );
+};
+
 export const SearchUsersPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
@@ -88,56 +151,16 @@ export const SearchUsersPage = () => {
         <div className="text-center text-gray-600 py-12">Searching...</div>
       ) : searchResults && searchResults.length > 0 ? (
         <div className="space-y-3">
-          {searchResults.map((user: User) => {
-            const isFriend = friendIds.has(user.id);
-            const isPending = addFriendMutation.isPending;
-
-            return (
-              <div
-                key={user.id}
-                className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between hover:shadow-lg transition-shadow"
-              >
-                <button
-                  onClick={() => navigate(`/profile/${user.username}`)}
-                  className="flex items-center space-x-3 flex-1"
-                >
-                  <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
-                    {user.avatarUrl ? (
-                      <img
-                        src={user.avatarUrl}
-                        alt={user.name}
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-2xl">👤</span>
-                    )}
-                  </div>
-                  <div className="text-left">
-                    <div className="font-semibold text-gray-900">
-                      {user.name}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      @{user.username}
-                    </div>
-                  </div>
-                </button>
-                {!isFriend && (
-                  <button
-                    onClick={() => handleAddFriend(user.id)}
-                    disabled={isPending}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Add Friend
-                  </button>
-                )}
-                {isFriend && (
-                  <span className="px-4 py-2 bg-green-100 text-green-800 rounded-lg font-medium">
-                    Friends ✓
-                  </span>
-                )}
-              </div>
-            );
-          })}
+          {searchResults.map((user: User) => (
+            <UserSearchResult
+              key={user.id}
+              user={user}
+              isFriend={friendIds.has(user.id)}
+              onAddFriend={handleAddFriend}
+              onNavigate={() => navigate(`/profile/${user.username}`)}
+              isAddingFriend={addFriendMutation.isPending}
+            />
+          ))}
         </div>
       ) : (
         <div className="text-center text-gray-600 py-12">

@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import { config } from './config/config';
 import { connectDB } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
@@ -13,12 +14,16 @@ import feedRoutes from './routes/feedRoutes';
 import locationRoutes from './routes/locationRoutes';
 import friendRoutes from './routes/friendRoutes';
 import commentRoutes from './routes/commentRoutes';
+import notificationRoutes from './routes/notificationRoutes';
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files (avatars)
+app.use('/avatars', express.static(path.join(__dirname, '../avatars')));
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -34,6 +39,7 @@ app.use('/api/feed', feedRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/friends', friendRoutes);
 app.use('/api', commentRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Error handler
 app.use(errorHandler);

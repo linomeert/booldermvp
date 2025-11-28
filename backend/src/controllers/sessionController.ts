@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { Session } from '../models/Session';
 import { Climb, IClimb } from '../models/Climb';
+import { Notification } from '../models/Notification';
 
 export const createSession = async (
   req: AuthRequest,
@@ -119,6 +120,54 @@ export const getMySessions = async (
   }
 };
 
+export const getUserSessions = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { username } = req.params;
+
+    // Find user by username
+    const { User } = await import('../models/User');
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const sessions = await Session.find({ userId: user._id })
+      .sort({ startedAt: -1 })
+      .populate('gymId')
+      .populate('cragId')
+      .populate('participants', 'name username avatarUrl')
+      .lean();
+
+    // Fetch climbs for each session
+    const sessionsWithClimbs = await Promise.all(
+      sessions.map(async (session: any) => {
+        const climbs = await Climb.find({ sessionId: session._id })
+          .populate('gymId')
+          .populate('cragId')
+          .sort({ createdAt: 1 })
+          .lean();
+        // Transform gymId/cragId to gym/crag for climbs
+        const transformedClimbs = climbs.map((climb: any) => ({
+          ...climb,
+          gym: climb.gymId,
+          crag: climb.cragId,
+        }));
+        return { ...session, climbs: transformedClimbs };
+      })
+    );
+
+    res.json(sessionsWithClimbs);
+  } catch (error) {
+    console.error('Get user sessions error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 export const getFeedSessions = async (
   req: AuthRequest,
   res: Response
@@ -126,9 +175,12 @@ export const getFeedSessions = async (
   try {
     const userId = req.userId!;
 
-    // Get user's friends
+    // Get user's accepted friends only
     const { Friendship } = await import('../models/Friendship');
-    const friendships = await Friendship.find({ userId }).select('friendId');
+    const friendships = await Friendship.find({ 
+      userId,
+      status: 'accepted'
+    }).select('friendId');
     const friendIds = friendships.map((f) => f.friendId);
 
     // Include user's own ID to show their sessions too
@@ -281,6 +333,16 @@ export const fistbumpSession = async (
       // Add fistbump
       session.fistbumps.push(userId as any);
       session.fistbumpCount = session.fistbumps.length;
+
+      // Create notification for session owner (if not self-fistbump)
+      if (session.userId.toString() !== userId) {
+        await Notification.create({
+          userId: session.userId,
+          type: 'fistbump',
+          fromUserId: userId,
+          sessionId: session._id,
+        });
+      }
     }
 
     await session.save();

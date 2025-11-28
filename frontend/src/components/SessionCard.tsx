@@ -91,7 +91,56 @@ export const SessionCard = ({
 
   const fistbumpMutation = useMutation({
     mutationFn: fistbumpSession,
-    onSuccess: () => {
+    onMutate: async () => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["feed"] });
+      await queryClient.cancelQueries({ queryKey: ["feed-sessions"] });
+
+      // Snapshot previous values
+      const previousFeed = queryClient.getQueryData(["feed"]);
+      const previousFeedSessions = queryClient.getQueryData(["feed-sessions"]);
+
+      // Optimistically update
+      queryClient.setQueryData(
+        ["feed-sessions"],
+        (old: Session[] | undefined) => {
+          if (!old) return old;
+          return old.map((s) => {
+            if (s.id === session.id) {
+              const isCurrentlyFistbumped = s.fistbumps?.includes(
+                user?.id || ""
+              );
+              return {
+                ...s,
+                fistbumps: isCurrentlyFistbumped
+                  ? s.fistbumps.filter((id) => id !== user?.id)
+                  : [...(s.fistbumps || []), user?.id || ""],
+                fistbumpCount: isCurrentlyFistbumped
+                  ? (s.fistbumpCount || 1) - 1
+                  : (s.fistbumpCount || 0) + 1,
+              };
+            }
+            return s;
+          });
+        }
+      );
+
+      return { previousFeed, previousFeedSessions };
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback on error
+      if (context?.previousFeed) {
+        queryClient.setQueryData(["feed"], context.previousFeed);
+      }
+      if (context?.previousFeedSessions) {
+        queryClient.setQueryData(
+          ["feed-sessions"],
+          context.previousFeedSessions
+        );
+      }
+    },
+    onSettled: () => {
+      // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: ["feed"] });
       queryClient.invalidateQueries({ queryKey: ["feed-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["my-sessions"] });
@@ -156,7 +205,10 @@ export const SessionCard = ({
             >
               <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
                 <img
-                  src={`https://avatar.iran.liara.run/public?username=${session.user.username}`}
+                  src={
+                    session.user.avatarUrl ||
+                    `https://avatar.iran.liara.run/public?username=${session.user.username}`
+                  }
                   alt={session.user.name}
                   className="w-full h-full object-cover"
                 />
@@ -556,7 +608,10 @@ export const SessionCard = ({
                         >
                           <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
                             <img
-                              src={`https://avatar.iran.liara.run/public?username=${comment.user?.username}`}
+                              src={
+                                comment.user?.avatarUrl ||
+                                `https://avatar.iran.liara.run/public?username=${comment.user?.username}`
+                              }
                               alt={comment.user?.name}
                               className="w-full h-full object-cover"
                             />

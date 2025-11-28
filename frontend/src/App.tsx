@@ -11,6 +11,7 @@ import { StartSessionPage } from "./pages/StartSessionPage";
 import { LogClimbPage } from "./pages/LogClimbPage";
 import { ClimbDetailPage } from "./pages/ClimbDetailPage";
 import { SearchUsersPage } from "./pages/SearchUsersPage";
+import NotificationsPage from "./pages/NotificationsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -100,6 +101,14 @@ function AppRoutes() {
             element={
               <ProtectedRoute>
                 <SearchUsersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />
