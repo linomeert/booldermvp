@@ -57,6 +57,14 @@ export const SessionCard = ({
   const [commentText, setCommentText] = useState("");
   const climbs = session.climbs || [];
 
+  console.log(
+    "SessionCard - Session ID:",
+    session.id,
+    "Climbs:",
+    climbs.length,
+    session.climbs
+  );
+
   // Sort climbs: flashes first, then tops, then projects
   const sortedClimbs = [...climbs].sort((a, b) => {
     const aIsFlash = a.status === "top" && a.attempts === 1;
@@ -402,13 +410,22 @@ export const SessionCard = ({
                   climb.status === "project" ? "opacity-60" : ""
                 }`}
               >
-                {climb.mediaUrl ? (
+                {climb.mediaUrl || (climb.images && climb.images.length > 0) ? (
                   <div className="relative h-24 bg-gray-100">
                     <img
-                      src={climb.mediaUrl}
+                      src={
+                        climb.images && climb.images.length > 0
+                          ? climb.images[0]
+                          : climb.mediaUrl
+                      }
                       alt={`Climb ${climb.grade}`}
                       className="w-full h-full object-cover"
                     />
+                    {climb.images && climb.images.length > 1 && (
+                      <div className="absolute bottom-1 right-1 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
+                        +{climb.images.length - 1}
+                      </div>
+                    )}
                     <div
                       className={`absolute top-1 right-1 text-xs px-2 py-1 rounded shadow-md ${
                         climb.grade.toLowerCase() === "white"

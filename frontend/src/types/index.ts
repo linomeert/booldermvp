@@ -27,6 +27,7 @@ export interface Climb {
   style?: string;
   attempts?: number;
   mediaUrl?: string;
+  images?: string[];
   notes?: string;
   projectDate?: string;
   createdAt: string;
@@ -112,6 +113,7 @@ export interface CreateClimbRequest {
   style?: string;
   attempts?: number;
   mediaUrl?: string;
+  images?: string[];
   notes?: string;
 }
 

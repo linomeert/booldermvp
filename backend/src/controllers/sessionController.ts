@@ -145,13 +145,32 @@ export const getMySessions = async (
       .populate('participants', 'name username avatarUrl')
       .lean();
 
-    const transformedSessions = sessions.map((session: any) => ({
-      ...session,
-      gym: session.gymId,
-      crag: session.cragId,
-    }));
+    // Fetch climbs for each session
+    const sessionsWithClimbs = await Promise.all(
+      sessions.map(async (session: any) => {
+        const climbs = await Climb.find({ sessionId: session._id })
+          .populate('gymId')
+          .populate('cragId')
+          .sort({ createdAt: 1 })
+          .lean();
+        
+        // Transform gymId/cragId to gym/crag for climbs
+        const transformedClimbs = climbs.map((climb: any) => ({
+          ...climb,
+          gym: climb.gymId,
+          crag: climb.cragId,
+        }));
+        
+        return {
+          ...session,
+          gym: session.gymId,
+          crag: session.cragId,
+          climbs: transformedClimbs,
+        };
+      })
+    );
 
-    res.json(transformedSessions);
+    res.json(sessionsWithClimbs);
   } catch (error) {
     console.error('Get my sessions error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -189,6 +208,9 @@ export const getUserSessions = async (
           .populate('cragId')
           .sort({ createdAt: 1 })
           .lean();
+        
+        console.log(`Session ${session._id}: Found ${climbs.length} climbs`);
+        
         // Transform gymId/cragId to gym/crag for climbs
         const transformedClimbs = climbs.map((climb: any) => ({
           ...climb,
@@ -204,6 +226,7 @@ export const getUserSessions = async (
       })
     );
 
+    console.log(`Returning ${sessionsWithClimbs.length} sessions with climbs`);
     res.json(sessionsWithClimbs);
   } catch (error) {
     console.error('Get user sessions error:', error);

@@ -14,6 +14,8 @@ export const LogClimbPage = () => {
 
   const [gradeType, setGradeType] = useState<"us" | "fr" | "color">("us");
   const [climberId, setClimberId] = useState<string>("");
+  const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     status: "top" as ClimbStatus,
     locationType: "indoor" as LocationType,
@@ -181,11 +183,36 @@ export const LogClimbPage = () => {
     if (formData.style) data.style = formData.style;
     if (formData.attempts) data.attempts = parseInt(formData.attempts);
     if (formData.mediaUrl) data.mediaUrl = formData.mediaUrl;
+    if (images.length > 0) data.images = images;
     if (formData.notes) data.notes = formData.notes;
     if (formData.sessionId) data.sessionId = formData.sessionId;
     if (climberId) data.climberId = climberId;
 
     createClimbMutation.mutate(data);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const uploadPromises = Array.from(files).map((file) =>
+        api.uploadImage(file)
+      );
+      const results = await Promise.all(uploadPromises);
+      const urls = results.map((result) => result.url);
+      setImages((prev) => [...prev, ...urls]);
+    } catch (error) {
+      console.error("Failed to upload images:", error);
+      alert("Failed to upload images. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const activeSessions = sessions?.filter((s) => !s.endedAt) || [];
@@ -523,6 +550,46 @@ export const LogClimbPage = () => {
             placeholder="https://..."
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            📷 Photos
+          </label>
+          <div className="space-y-3">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              capture="environment"
+              onChange={handleImageUpload}
+              disabled={uploading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+            />
+            {uploading && (
+              <p className="text-sm text-gray-500">Uploading images...</p>
+            )}
+            {images.length > 0 && (
+              <div className="grid grid-cols-3 gap-2">
+                {images.map((url, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={url}
+                      alt={`Upload ${index + 1}`}
+                      className="w-full h-24 object-cover rounded-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div>

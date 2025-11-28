@@ -64,13 +64,38 @@ export const ClimbDetailPage = () => {
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Image Section */}
-        {climb.mediaUrl ? (
-          <div className="w-full aspect-square bg-gray-200">
-            <img
-              src={climb.mediaUrl}
-              alt={`Climb ${climb.grade}`}
-              className="w-full h-full object-cover"
-            />
+        {(climb.images && climb.images.length > 0) || climb.mediaUrl ? (
+          <div className="w-full">
+            {climb.images && climb.images.length > 0 ? (
+              <div
+                className={
+                  climb.images.length === 1
+                    ? "w-full aspect-square bg-gray-200"
+                    : "grid grid-cols-2 gap-1 bg-gray-200"
+                }
+              >
+                {climb.images.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`Climb ${climb.grade} - Photo ${index + 1}`}
+                    className={
+                      climb.images!.length === 1
+                        ? "w-full h-full object-cover"
+                        : "w-full aspect-square object-cover"
+                    }
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="w-full aspect-square bg-gray-200">
+                <img
+                  src={climb.mediaUrl}
+                  alt={`Climb ${climb.grade}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
           </div>
         ) : (
           <div className="w-full aspect-square bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">

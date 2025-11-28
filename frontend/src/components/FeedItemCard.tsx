@@ -93,13 +93,22 @@ export const FeedItemCard = ({
         </div>
       </div>
 
-      {climb.mediaUrl ? (
+      {(climb.images && climb.images.length > 0) || climb.mediaUrl ? (
         <div className="aspect-square bg-gray-200 relative">
           <img
-            src={climb.mediaUrl}
+            src={
+              climb.images && climb.images.length > 0
+                ? climb.images[0]
+                : climb.mediaUrl
+            }
             alt={`Climb ${climb.grade}`}
             className="w-full h-full object-cover"
           />
+          {climb.images && climb.images.length > 1 && (
+            <div className="absolute bottom-3 right-3 bg-black bg-opacity-70 text-white text-sm px-3 py-1 rounded-full font-semibold">
+              +{climb.images.length - 1}
+            </div>
+          )}
           {climb.status === "top" && climb.attempts === 1 && (
             <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1.5 rounded-full font-bold text-sm shadow-lg animate-pulse">
               ⚡ FLASH!

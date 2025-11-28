@@ -41,13 +41,22 @@ export const ClimbCard = ({
       to={`/climbs/${climb.id}`}
       className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
     >
-      {climb.mediaUrl ? (
-        <div className="aspect-square bg-gray-200">
+      {(climb.images && climb.images.length > 0) || climb.mediaUrl ? (
+        <div className="aspect-square bg-gray-200 relative">
           <img
-            src={climb.mediaUrl}
+            src={
+              climb.images && climb.images.length > 0
+                ? climb.images[0]
+                : climb.mediaUrl
+            }
             alt={`Climb ${climb.grade}`}
             className="w-full h-full object-cover"
           />
+          {climb.images && climb.images.length > 1 && (
+            <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full font-semibold">
+              +{climb.images.length - 1}
+            </div>
+          )}
         </div>
       ) : (
         <div className="aspect-square bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">

@@ -15,6 +15,7 @@ export interface IClimb extends Document {
   style?: string;
   attempts?: number;
   mediaUrl?: string;
+  images?: string[];
   notes?: string;
   projectDate?: Date;
   createdAt: Date;
@@ -34,6 +35,7 @@ const ClimbSchema = new Schema<IClimb>(
     style: { type: String },
     attempts: { type: Number },
     mediaUrl: { type: String },
+    images: { type: [String], default: [] },
     notes: { type: String },
     projectDate: { type: Date },
   },

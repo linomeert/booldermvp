@@ -14,6 +14,7 @@ import locationRoutes from './routes/locationRoutes';
 import friendRoutes from './routes/friendRoutes';
 import commentRoutes from './routes/commentRoutes';
 import notificationRoutes from './routes/notificationRoutes';
+import uploadRoutes from './routes/uploadRoutes';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/api/locations', locationRoutes);
 app.use('/api/friends', friendRoutes);
 app.use('/api', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 // Error handler
 app.use(errorHandler);

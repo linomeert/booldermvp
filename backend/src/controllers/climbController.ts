@@ -20,6 +20,7 @@ export const createClimb = async (
       style,
       attempts,
       mediaUrl,
+      images,
       notes,
     } = req.body;
 
@@ -44,6 +45,7 @@ export const createClimb = async (
     if (style) climbData.style = style;
     if (attempts) climbData.attempts = attempts;
     if (mediaUrl) climbData.mediaUrl = mediaUrl;
+    if (images && Array.isArray(images)) climbData.images = images;
     if (notes) climbData.notes = notes;
 
     const climb = await Climb.create(climbData);

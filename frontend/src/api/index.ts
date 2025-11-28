@@ -108,3 +108,32 @@ export const markAllNotificationsAsRead = () =>
   apiPatch<{ count: number }>('/notifications/read-all');
 export const deleteNotification = (id: string) =>
   apiDelete<{ message: string }>(`/notifications/${id}`);
+
+// Uploads
+export const uploadImage = async (file: File): Promise<{ url: string }> => {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const token = localStorage.getItem('authToken');
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+  if (!token || token === 'null') {
+    throw new Error('No authentication token found. Please log in again.');
+  }
+
+  const response = await fetch(`${API_URL}/api/uploads/image`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    console.error('Upload error:', error);
+    throw new Error(error.message || 'Failed to upload image');
+  }
+
+  return response.json();
+};
