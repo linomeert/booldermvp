@@ -144,18 +144,11 @@ export default function NotificationsPage() {
                     to={`/profile/${notification.fromUser?.username}`}
                     className="flex items-center gap-3 mb-2 hover:opacity-80 transition-opacity"
                   >
-                    {notification.fromUser?.avatarUrl ? (
-                      <img
-                        src={notification.fromUser.avatarUrl}
-                        alt={notification.fromUser.username}
-                        className="w-10 h-10 rounded-full"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold">
-                        {notification.fromUser?.username?.[0]?.toUpperCase() ||
-                          "?"}
-                      </div>
-                    )}
+                    <img
+                      src={`https://avatar.iran.liara.run/public?username=${notification.fromUser?.username}`}
+                      alt={notification.fromUser?.username}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
                     <div className="flex-1">
                       <p className="text-sm font-medium">
                         {getNotificationMessage(notification)}

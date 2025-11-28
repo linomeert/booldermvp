@@ -215,10 +215,7 @@ export const SessionCard = ({
             >
               <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
                 <img
-                  src={
-                    session.user.avatarUrl ||
-                    `https://avatar.iran.liara.run/public?username=${session.user.username}`
-                  }
+                  src={`https://avatar.iran.liara.run/public?username=${session.user.username}`}
                   alt={session.user.name}
                   className="w-full h-full object-cover"
                 />
@@ -629,10 +626,7 @@ export const SessionCard = ({
                         >
                           <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
                             <img
-                              src={
-                                comment.user?.avatarUrl ||
-                                `https://avatar.iran.liara.run/public?username=${comment.user?.username}`
-                              }
+                              src={`https://avatar.iran.liara.run/public?username=${comment.user?.username}`}
                               alt={comment.user?.name}
                               className="w-full h-full object-cover"
                             />

@@ -46,16 +46,12 @@ export const FeedItemCard = ({
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="p-4">
         <div className="flex items-center space-x-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-            {climb.user?.avatarUrl ? (
-              <img
-                src={climb.user.avatarUrl}
-                alt={climb.user.name}
-                className="w-full h-full rounded-full object-cover"
-              />
-            ) : (
-              <span className="text-lg">👤</span>
-            )}
+          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
+            <img
+              src={`https://avatar.iran.liara.run/public?username=${climb.user?.username}`}
+              alt={climb.user?.name}
+              className="w-full h-full rounded-full object-cover"
+            />
           </div>
           <div className="flex-1">
             <Link

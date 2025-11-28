@@ -30,16 +30,12 @@ const UserSearchResult = ({
         onClick={onNavigate}
         className="flex items-center space-x-3 flex-1"
       >
-        <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
-          {user.avatarUrl ? (
-            <img
-              src={user.avatarUrl}
-              alt={user.name}
-              className="w-full h-full rounded-full object-cover"
-            />
-          ) : (
-            <span className="text-2xl">👤</span>
-          )}
+        <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
+          <img
+            src={`https://avatar.iran.liara.run/public?username=${user.username}`}
+            alt={user.name}
+            className="w-full h-full object-cover"
+          />
         </div>
         <div className="text-left">
           <div className="font-semibold text-gray-900">{user.name}</div>

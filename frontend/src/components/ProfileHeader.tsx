@@ -9,16 +9,12 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-start space-x-6">
-        <div className="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
-          {user.avatarUrl ? (
-            <img
-              src={user.avatarUrl}
-              alt={user.name}
-              className="w-full h-full rounded-full object-cover"
-            />
-          ) : (
-            <span className="text-4xl">👤</span>
-          )}
+        <div className="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+          <img
+            src={`https://avatar.iran.liara.run/public?username=${user.username}`}
+            alt={user.name}
+            className="w-full h-full rounded-full object-cover"
+          />
         </div>
 
         <div className="flex-1">

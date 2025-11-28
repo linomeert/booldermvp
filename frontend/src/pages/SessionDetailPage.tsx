@@ -630,10 +630,7 @@ export const SessionDetailPage = () => {
                     >
                       <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
                         <img
-                          src={
-                            comment.user?.avatarUrl ||
-                            `https://avatar.iran.liara.run/public?username=${comment.user?.username}`
-                          }
+                          src={`https://avatar.iran.liara.run/public?username=${comment.user?.username}`}
                           alt={comment.user?.name}
                           className="w-full h-full object-cover rounded-full"
                         />

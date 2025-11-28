@@ -259,16 +259,12 @@ export const ProfilePage = () => {
                     onClick={() => navigate(`/profile/${friend.username}`)}
                     className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow text-center"
                   >
-                    <div className="w-20 h-20 mx-auto mb-3 rounded-full bg-primary-100 flex items-center justify-center">
-                      {friend.avatarUrl ? (
-                        <img
-                          src={friend.avatarUrl}
-                          alt={friend.name}
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-4xl">👤</span>
-                      )}
+                    <div className="w-20 h-20 mx-auto mb-3 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
+                      <img
+                        src={`https://avatar.iran.liara.run/public?username=${friend.username}`}
+                        alt={friend.name}
+                        className="w-full h-full rounded-full object-cover"
+                      />
                     </div>
                     <div className="font-semibold text-gray-900">
                       {friend.name}

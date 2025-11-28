@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import { config } from './config/config';
 import { connectDB } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
@@ -21,9 +20,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Serve static files (avatars)
-app.use('/avatars', express.static(path.join(__dirname, '../avatars')));
 
 // Health check
 app.get('/health', (_req, res) => {

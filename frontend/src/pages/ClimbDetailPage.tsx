@@ -173,16 +173,12 @@ export const ClimbDetailPage = () => {
           {climb.user && (
             <div className="border-t pt-4 mt-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
-                  {climb.user.avatarUrl ? (
-                    <img
-                      src={climb.user.avatarUrl}
-                      alt={climb.user.name}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-2xl">👤</span>
-                  )}
+                <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={`https://avatar.iran.liara.run/public?username=${climb.user.username}`}
+                    alt={climb.user.name}
+                    className="w-full h-full rounded-full object-cover"
+                  />
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">Climbed by</div>
