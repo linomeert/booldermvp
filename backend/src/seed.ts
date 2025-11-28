@@ -8,6 +8,9 @@ import { Friendship } from './models/Friendship';
 import { Notification } from './models/Notification';
 import { config } from './config/config';
 
+// Use environment-aware backend URL for avatars
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+
 const grades = ['V0', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10'];
 const styles = ['flash', 'redpoint', 'onsight'];
 
@@ -104,7 +107,7 @@ async function main() {
       username: userData.username,
       email: userData.email || `${userData.username}@example.com`,
       password,
-      avatarUrl: `/avatars/${avatarPath}/uifaces-popular-avatar (${userData.avatarNum}).jpg`,
+      avatarUrl: `${BACKEND_URL}/avatars/${avatarPath}/uifaces-popular-avatar (${userData.avatarNum}).jpg`,
     });
     users.push(user);
   }
