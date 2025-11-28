@@ -48,12 +48,12 @@ export const FeedPage = () => {
     const dateA = new Date(
       a.type === "climb"
         ? a.data.createdAt
-        : a.data.startedAt || a.data.endedAt || ""
+        : a.data.endedAt || a.data.startedAt
     ).getTime();
     const dateB = new Date(
       b.type === "climb"
         ? b.data.createdAt
-        : b.data.startedAt || b.data.endedAt || ""
+        : b.data.endedAt || b.data.startedAt
     ).getTime();
     return dateB - dateA;
   });
