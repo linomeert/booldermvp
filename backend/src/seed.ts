@@ -1,0 +1,214 @@
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import { Gym, Crag } from './models/Location';
+import { User } from './models/User';
+import { Session } from './models/Session';
+import { Climb } from './models/Climb';
+import { Friendship } from './models/Friendship';
+import { config } from './config/config';
+
+const grades = ['V0', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10'];
+const styles = ['flash', 'redpoint', 'onsight'];
+
+function randomElement<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+async function main() {
+  console.log('🌱 Starting seed...');
+
+  await mongoose.connect(config.mongodbUri);
+  console.log('✅ Database connected');
+
+  // Clear existing data
+  await User.deleteMany({});
+  await Session.deleteMany({});
+  await Climb.deleteMany({});
+  await Friendship.deleteMany({});
+  await Gym.deleteMany({});
+  await Crag.deleteMany({});
+
+  // Create gyms
+  const gym1 = await Gym.create({
+    name: 'Boulder Central',
+    city: 'Amsterdam',
+    country: 'Netherlands',
+  });
+
+  const gym2 = await Gym.create({
+    name: 'Momentum Climbing',
+    city: 'Utrecht',
+    country: 'Netherlands',
+  });
+
+  const gym3 = await Gym.create({
+    name: 'The Climb',
+    city: 'Rotterdam',
+    country: 'Netherlands',
+  });
+
+  // Create crags
+  const crag1 = await Crag.create({
+    name: 'Fontainebleau',
+    area: 'Île-de-France',
+    country: 'France',
+  });
+
+  const crag2 = await Crag.create({
+    name: 'Magic Wood',
+    area: 'Graubünden',
+    country: 'Switzerland',
+  });
+
+  const locations = [
+    { type: 'indoor', id: gym1._id },
+    { type: 'indoor', id: gym2._id },
+    { type: 'indoor', id: gym3._id },
+    { type: 'outdoor', id: crag1._id },
+    { type: 'outdoor', id: crag2._id },
+  ];
+
+  // Create 10 users
+  const password = await bcrypt.hash('password123', 10);
+  const userNames = [
+    { name: 'Alex Johnson', username: 'alexj' },
+    { name: 'Sam Rivera', username: 'samr' },
+    { name: 'Jordan Chen', username: 'jordanc' },
+    { name: 'Taylor Smith', username: 'taylors' },
+    { name: 'Morgan Lee', username: 'morganl' },
+    { name: 'Casey Brown', username: 'caseyb' },
+    { name: 'Riley Davis', username: 'rileyd' },
+    { name: 'Avery Wilson', username: 'averyw' },
+    { name: 'Quinn Martinez', username: 'quinnm' },
+    { name: 'Jamie Garcia', username: 'jamieg' },
+  ];
+
+  const users = [];
+  for (const userData of userNames) {
+    const user = await User.create({
+      name: userData.name,
+      username: userData.username,
+      email: `${userData.username}@example.com`,
+      password,
+      avatarUrl: `https://avatar.iran.liara.run/public?username=${userData.username}`,
+    });
+    users.push(user);
+  }
+
+  console.log('✅ Created 10 users');
+
+  // Create friendships between first 5 users
+  const friendGroup = users.slice(0, 5);
+  for (let i = 0; i < friendGroup.length; i++) {
+    for (let j = i + 1; j < friendGroup.length; j++) {
+      await Friendship.create([
+        { userId: friendGroup[i]._id, friendId: friendGroup[j]._id },
+        { userId: friendGroup[j]._id, friendId: friendGroup[i]._id },
+      ]);
+    }
+  }
+
+  console.log('✅ Created friendships for first 5 users');
+
+  // Create 2-3 sessions per user with climbs
+  for (const user of users) {
+    const numSessions = randomInt(2, 3);
+
+    for (let i = 0; i < numSessions; i++) {
+      const location = randomElement(locations);
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - randomInt(1, 30));
+      
+      const sessionData: any = {
+        userId: user._id,
+        locationType: location.type,
+        startedAt: startDate,
+      };
+
+      if (location.type === 'indoor') {
+        sessionData.gymId = location.id;
+      } else {
+        sessionData.cragId = location.id;
+      }
+
+      // Create session
+      const session = await Session.create(sessionData);
+
+      // Add 5-12 climbs to the session
+      const numClimbs = randomInt(5, 12);
+      let topsCount = 0;
+      let projectsCount = 0;
+      let hardestGrade = 'V0';
+
+      for (let j = 0; j < numClimbs; j++) {
+        const climbDate = new Date(startDate);
+        climbDate.setMinutes(climbDate.getMinutes() + j * 10);
+        
+        const status = Math.random() > 0.3 ? 'top' : 'project';
+        const grade = randomElement(grades);
+        
+        if (status === 'top') topsCount++;
+        if (status === 'project') projectsCount++;
+        
+        // Update hardest grade (simplified)
+        if (parseInt(grade.substring(1)) > parseInt(hardestGrade.substring(1))) {
+          hardestGrade = grade;
+        }
+
+        const climbData: any = {
+          userId: user._id,
+          sessionId: session._id,
+          status,
+          locationType: location.type,
+          grade,
+          style: status === 'top' ? randomElement(styles) : undefined,
+          attempts: status === 'project' ? randomInt(2, 8) : randomInt(1, 3),
+          createdAt: climbDate,
+        };
+
+        if (location.type === 'indoor') {
+          climbData.gymId = location.id;
+        } else {
+          climbData.cragId = location.id;
+        }
+
+        await Climb.create(climbData);
+      }
+
+      // End session and update stats
+      const endDate = new Date(startDate);
+      endDate.setHours(endDate.getHours() + randomInt(2, 4));
+      const durationSeconds = Math.floor((endDate.getTime() - startDate.getTime()) / 1000);
+
+      await Session.findByIdAndUpdate(session._id, {
+        endedAt: endDate,
+        durationSeconds,
+        climbCount: numClimbs,
+        topsCount,
+        projectsCount,
+        hardestGrade,
+      });
+    }
+  }
+
+  console.log('✅ Created sessions and climbs for all users');
+  console.log('✅ Seed completed!');
+  console.log('📊 Summary:');
+  console.log('  - 10 users created (password: password123)');
+  console.log('  - First 5 users are friends with each other');
+  console.log('  - 3 gyms and 2 crags created');
+  console.log('  - Each user has 2-3 sessions with 5-12 climbs each');
+}
+
+main()
+  .catch((e) => {
+    console.error('❌ Seed failed:', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await mongoose.disconnect();
+  });

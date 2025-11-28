@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  username  String   @unique
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  climbs   Climb[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Climb {
+  id           String       @id @default(uuid())
+  userId       String
+  sessionId    String?
+  status       ClimbStatus
+  locationType LocationType
+  gymId        String?
+  cragId       String?
+  grade        String
+  style        String?
+  attempts     Int?
+  mediaUrl     String?
+  notes        String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  gym     Gym?     @relation(fields: [gymId], references: [id])
+  crag    Crag?    @relation(fields: [cragId], references: [id])
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("climbs")
+}
+
+model Session {
+  id              String       @id @default(uuid())
+  userId          String
+  locationType    LocationType
+  gymId           String?
+  cragId          String?
+  startedAt       DateTime     @default(now())
+  endedAt         DateTime?
+  durationSeconds Int?
+  climbCount      Int          @default(0)
+  topsCount       Int          @default(0)
+  projectsCount   Int          @default(0)
+  hardestGrade    String?
+  syncedToStrava  Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gym    Gym?    @relation(fields: [gymId], references: [id])
+  crag   Crag?   @relation(fields: [cragId], references: [id])
+  climbs Climb[]
+
+  @@index([userId])
+  @@index([startedAt])
+  @@map("sessions")
+}
+
+model Gym {
+  id      String @id @default(uuid())
+  name    String
+  city    String?
+  country String?
+
+  climbs   Climb[]
+  sessions Session[]
+
+  @@map("gyms")
+}
+
+model Crag {
+  id      String @id @default(uuid())
+  name    String
+  area    String?
+  country String?
+
+  climbs   Climb[]
+  sessions Session[]
+
+  @@map("crags")
+}
+
+enum ClimbStatus {
+  top
+  project
+}
+
+enum LocationType {
+  indoor
+  outdoor
+}
