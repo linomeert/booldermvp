@@ -80,9 +80,10 @@ async function main() {
     { type: 'outdoor', id: crag2._id },
   ];
 
-  // Create 10 users with local avatars
+  // Create users with local avatars
   const password = await bcrypt.hash('password123', 10);
   const userNames = [
+    { name: 'Lino Meert', username: 'linomeert', email: 'lino.meert@gmail.com', gender: 'male', avatarNum: 13 },
     { name: 'Alex Johnson', username: 'alexj', gender: 'male', avatarNum: 5 },
     { name: 'Sam Rivera', username: 'samr', gender: 'female', avatarNum: 3 },
     { name: 'Jordan Chen', username: 'jordanc', gender: 'male', avatarNum: 7 },
@@ -101,14 +102,14 @@ async function main() {
     const user = await User.create({
       name: userData.name,
       username: userData.username,
-      email: `${userData.username}@example.com`,
+      email: userData.email || `${userData.username}@example.com`,
       password,
-      avatarUrl: `http://localhost:3001/avatars/${avatarPath}/uifaces-popular-avatar (${userData.avatarNum}).jpg`,
+      avatarUrl: `/avatars/${avatarPath}/uifaces-popular-avatar (${userData.avatarNum}).jpg`,
     });
     users.push(user);
   }
 
-  console.log('✅ Created 10 users');
+  console.log('✅ Created 11 users');
 
   // Create accepted friendships between first 5 users
   const friendGroup = users.slice(0, 5);
@@ -121,7 +122,17 @@ async function main() {
     }
   }
 
-  console.log('✅ Created friendships for first 5 users');
+  // Create friendships for Lino (users[0]) with 3 users outside the first 5
+  const linoUser = users[0];
+  const randomFriends = [users[6], users[7], users[9]]; // Riley, Avery, Jamie
+  for (const friend of randomFriends) {
+    await Friendship.create([
+      { userId: linoUser._id, friendId: friend._id, status: 'accepted' },
+      { userId: friend._id, friendId: linoUser._id, status: 'accepted' },
+    ]);
+  }
+
+  console.log('✅ Created friendships for first 5 users and Lino');
 
   // Create 2-3 sessions per user with climbs
   for (const user of users) {
@@ -207,9 +218,10 @@ async function main() {
   console.log('✅ Created sessions and climbs for all users');
   console.log('✅ Seed completed!');
   console.log('📊 Summary:');
-  console.log('  - 10 users created (password: password123)');
+  console.log('  - 11 users created (password: password123)');
+  console.log('  - Lino Meert (lino.meert@gmail.com) friends with Riley, Avery, and Jamie');
   console.log('  - First 5 users are friends with each other');
-  console.log('  - 3 gyms and 2 crags created');
+  console.log('  - 4 gyms and 2 crags created');
   console.log('  - Each user has 2-3 sessions with 5-12 climbs each');
 }
 

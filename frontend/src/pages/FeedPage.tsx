@@ -46,14 +46,10 @@ export const FeedPage = () => {
 
   feedItems.sort((a, b) => {
     const dateA = new Date(
-      a.type === "climb"
-        ? a.data.createdAt
-        : a.data.endedAt || a.data.startedAt
+      a.type === "climb" ? a.data.createdAt : a.data.endedAt || a.data.startedAt
     ).getTime();
     const dateB = new Date(
-      b.type === "climb"
-        ? b.data.createdAt
-        : b.data.endedAt || b.data.startedAt
+      b.type === "climb" ? b.data.createdAt : b.data.endedAt || b.data.startedAt
     ).getTime();
     return dateB - dateA;
   });

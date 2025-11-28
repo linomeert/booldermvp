@@ -87,6 +87,7 @@ export const SearchUsersPage = () => {
     mutationFn: api.addFriend,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["friendship"] });
     },
   });
 
