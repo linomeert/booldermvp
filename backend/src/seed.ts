@@ -9,7 +9,8 @@ import { Notification } from './models/Notification';
 import { config } from './config/config';
 
 // Use environment-aware backend URL for avatars
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+// In production, RENDER_EXTERNAL_URL is set by Render automatically
+const BACKEND_URL = process.env.RENDER_EXTERNAL_URL || process.env.BACKEND_URL || 'http://localhost:3001';
 
 const grades = ['V0', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10'];
 const styles = ['flash', 'redpoint', 'onsight'];
