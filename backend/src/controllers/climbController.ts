@@ -38,8 +38,9 @@ export const createClimb = async (
     // Only add optional fields if they have values
     if (sessionId) climbData.sessionId = sessionId;
     if (climberId) climbData.climberId = climberId;
-    if (gymId) climbData.gymId = gymId;
-    if (cragId) climbData.cragId = cragId;
+    // Extract ID if gym/crag is passed as object
+    if (gymId) climbData.gymId = typeof gymId === 'object' ? gymId.id || gymId._id : gymId;
+    if (cragId) climbData.cragId = typeof cragId === 'object' ? cragId.id || cragId._id : cragId;
     if (style) climbData.style = style;
     if (attempts) climbData.attempts = attempts;
     if (mediaUrl) climbData.mediaUrl = mediaUrl;

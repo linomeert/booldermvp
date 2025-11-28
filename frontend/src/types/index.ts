@@ -48,6 +48,8 @@ export interface Session {
   topsCount: number;
   projectsCount: number;
   hardestGrade?: string;
+  rating?: number;
+  feeling?: string;
   syncedToStrava: boolean;
   fistbumps: string[];
   fistbumpCount: number;

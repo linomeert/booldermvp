@@ -163,7 +163,7 @@ export const Navbar = () => {
       {/* Mobile Bottom Nav */}
       {user && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-          <div className="grid grid-cols-5 h-16">
+          <div className="grid grid-cols-4 h-16">
             <Link
               to="/"
               className={`flex flex-col items-center justify-center space-y-1 ${
@@ -212,33 +212,6 @@ export const Navbar = () => {
                 />
               </svg>
               <span className="text-xs font-medium">Search</span>
-            </Link>
-
-            <Link
-              to="/log"
-              className={`flex flex-col items-center justify-center space-y-1 ${
-                isActive("/log")
-                  ? "text-primary-600"
-                  : "text-gray-600 hover:text-primary-600"
-              }`}
-            >
-              <div className="relative">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <span className="text-xs font-medium">Log</span>
             </Link>
 
             <Link

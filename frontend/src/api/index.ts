@@ -54,8 +54,8 @@ export const deleteClimb = (id: string) =>
 // Sessions
 export const createSession = (data: CreateSessionRequest) =>
   apiPost<Session>('/sessions', data);
-export const endSession = (id: string) =>
-  apiPatch<Session>(`/sessions/${id}/end`);
+export const endSession = (id: string, data?: { rating?: number; feeling?: string }) =>
+  apiPatch<Session>(`/sessions/${id}/end`, data || {});
 export const getMySessions = () => apiGet<Session[]>('/sessions/me');
 export const getUserSessions = (username: string) =>
   apiGet<Session[]>(`/sessions/user/${username}`);

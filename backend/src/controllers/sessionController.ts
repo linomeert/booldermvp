@@ -3,6 +3,7 @@ import { AuthRequest } from '../middleware/auth';
 import { Session } from '../models/Session';
 import { Climb, IClimb } from '../models/Climb';
 import { Notification } from '../models/Notification';
+import { Gym, Crag } from '../models/Location';
 
 export const createSession = async (
   req: AuthRequest,
@@ -10,21 +11,56 @@ export const createSession = async (
 ): Promise<void> => {
   try {
     const userId = req.userId!;
-    const { locationType, gymId, cragId } = req.body;
+    const { locationType, gymId, cragId, gymName, cragName } = req.body;
 
     if (!locationType) {
       res.status(400).json({ error: 'Location type is required' });
       return;
     }
 
+    let finalGymId = gymId;
+    let finalCragId = cragId;
+
+    // Create new gym if name provided but no ID
+    if (locationType === 'indoor' && !gymId && gymName) {
+      const newGym = await Gym.create({
+        name: gymName,
+        city: '', // Optional fields
+        country: '',
+      });
+      finalGymId = newGym._id;
+    }
+
+    // Create new crag if name provided but no ID
+    if (locationType === 'outdoor' && !cragId && cragName) {
+      const newCrag = await Crag.create({
+        name: cragName,
+        area: '', // Optional fields
+        country: '',
+      });
+      finalCragId = newCrag._id;
+    }
+
     const session = await Session.create({
       userId,
       locationType,
-      gymId: gymId || undefined,
-      cragId: cragId || undefined,
+      gymId: finalGymId || undefined,
+      cragId: finalCragId || undefined,
     });
 
-    res.status(201).json(session);
+    // Populate gym/crag data
+    await session.populate('gymId');
+    await session.populate('cragId');
+
+    // Transform to match frontend expectations
+    const sessionData = {
+      ...session.toObject(),
+      id: session._id.toString(),
+      gym: session.gymId,
+      crag: session.cragId,
+    };
+
+    res.status(201).json(sessionData);
   } catch (error) {
     console.error('Create session error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -37,6 +73,7 @@ export const endSession = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
+    const { rating, feeling } = req.body;
     const userId = req.userId!;
 
     const session = await Session.findById(id);
@@ -69,16 +106,21 @@ export const endSession = async (
     // Get hardest grade (simplified - just get the first one)
     const hardestGrade = climbs[0]?.grade || null;
 
+    const updateData: any = {
+      endedAt,
+      durationSeconds,
+      climbCount: climbs.length,
+      topsCount,
+      projectsCount,
+      hardestGrade,
+    };
+
+    if (rating) updateData.rating = rating;
+    if (feeling) updateData.feeling = feeling;
+
     const updatedSession = await Session.findByIdAndUpdate(
       id,
-      {
-        endedAt,
-        durationSeconds,
-        climbCount: climbs.length,
-        topsCount,
-        projectsCount,
-        hardestGrade,
-      },
+      updateData,
       { new: true }
     );
 
@@ -103,17 +145,13 @@ export const getMySessions = async (
       .populate('participants', 'name username avatarUrl')
       .lean();
 
-    // Fetch climbs for each session
-    const sessionsWithClimbs = await Promise.all(
-      sessions.map(async (session: any) => {
-        const climbs = await Climb.find({ sessionId: session._id })
-          .sort({ createdAt: 1 })
-          .lean();
-        return { ...session, climbs };
-      })
-    );
+    const transformedSessions = sessions.map((session: any) => ({
+      ...session,
+      gym: session.gymId,
+      crag: session.cragId,
+    }));
 
-    res.json(sessionsWithClimbs);
+    res.json(transformedSessions);
   } catch (error) {
     console.error('Get my sessions error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -157,7 +195,12 @@ export const getUserSessions = async (
           gym: climb.gymId,
           crag: climb.cragId,
         }));
-        return { ...session, climbs: transformedClimbs };
+        return { 
+          ...session, 
+          gym: session.gymId,
+          crag: session.cragId,
+          climbs: transformedClimbs 
+        };
       })
     );
 
@@ -218,6 +261,8 @@ export const getFeedSessions = async (
           ...rest, 
           userId: userId._id || userId,
           user: typeof userId === 'object' ? userId : undefined,
+          gym: session.gymId,
+          crag: session.cragId,
           climbs: transformedClimbs
         };
       })
@@ -263,7 +308,14 @@ export const getSessionById = async (
       crag: climb.cragId,
     }));
 
-    res.json({ ...session, climbs: transformedClimbs });
+    const transformedSession = {
+      ...session,
+      gym: session.gymId,
+      crag: session.cragId,
+      climbs: transformedClimbs
+    };
+
+    res.json(transformedSession);
   } catch (error) {
     console.error('Get session by id error:', error);
     res.status(500).json({ error: 'Server error' });

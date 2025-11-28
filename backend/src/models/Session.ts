@@ -14,6 +14,8 @@ export interface ISession extends Document {
   topsCount: number;
   projectsCount: number;
   hardestGrade?: string;
+  rating?: number;
+  feeling?: string;
   syncedToStrava: boolean;
   fistbumps: mongoose.Types.ObjectId[];
   fistbumpCount: number;
@@ -35,6 +37,8 @@ const SessionSchema = new Schema<ISession>(
     topsCount: { type: Number, default: 0 },
     projectsCount: { type: Number, default: 0 },
     hardestGrade: { type: String },
+    rating: { type: Number, min: 1, max: 5 },
+    feeling: { type: String },
     syncedToStrava: { type: Boolean, default: false },
     fistbumps: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
     fistbumpCount: { type: Number, default: 0 },

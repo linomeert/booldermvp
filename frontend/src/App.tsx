@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Navbar } from "./components/Navbar";
+import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { FeedPage } from "./pages/FeedPage";
@@ -40,20 +41,66 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/" />;
+  }
+
+  return <>{children}</>;
+}
+
 function AppRoutes() {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="pb-16 md:pb-0">
+      {user && <Navbar />}
+      <div className={user ? "pb-16 md:pb-0" : ""}>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/landing"
+            element={
+              <PublicRoute>
+                <LandingPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            }
+          />
           <Route
             path="/"
             element={
-              <ProtectedRoute>
-                <FeedPage />
-              </ProtectedRoute>
+              user ? (
+                <ProtectedRoute>
+                  <FeedPage />
+                </ProtectedRoute>
+              ) : (
+                <Navigate to="/landing" />
+              )
             }
           />
           <Route

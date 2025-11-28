@@ -37,6 +37,16 @@ const formatDate = (dateString: string) => {
   });
 };
 
+const getSessionTitle = (session: Session) => {
+  const locationType = session.locationType === "indoor" ? "Indoor" : "Outdoor";
+  const location = session.gym?.name || session.crag?.name;
+
+  if (location) {
+    return `${locationType} climbing session at ${location}`;
+  }
+  return `${locationType} climbing session`;
+};
+
 export const SessionCard = ({
   session,
   showDelete = false,
@@ -258,13 +268,24 @@ export const SessionCard = ({
               <span className="text-3xl">
                 {session.locationType === "indoor" ? "🏢" : "⛰️"}
               </span>
-              <div>
+              <div className="flex-1">
                 <h3 className="font-bold text-lg text-gray-900">
-                  {session.gym?.name || session.crag?.name || "Session"}
+                  {getSessionTitle(session)}
                 </h3>
-                <p className="text-sm text-gray-600">
-                  {formatDate(session.startedAt)}
-                </p>
+                <div className="flex items-center gap-3">
+                  <p className="text-sm text-gray-600">
+                    {formatDate(session.startedAt)}
+                  </p>
+                  {session.rating && session.endedAt && (
+                    <div className="flex items-center gap-0.5">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className="text-sm">
+                          {i < session.rating! ? "⭐" : "☆"}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             {showDelete && (

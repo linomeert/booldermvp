@@ -18,6 +18,8 @@ export const SessionDetailPage = () => {
   const [selectedProject, setSelectedProject] = useState<Climb | null>(null);
   const [logMode, setLogMode] = useState<"flash" | "top">("top");
   const [commentText, setCommentText] = useState("");
+  const [sessionRating, setSessionRating] = useState<number>(0);
+  const [sessionFeeling, setSessionFeeling] = useState("");
 
   const {
     data: session,
@@ -47,11 +49,18 @@ export const SessionDetailPage = () => {
   });
 
   const endSessionMutation = useMutation({
-    mutationFn: () => api.endSession(id!),
+    mutationFn: () =>
+      api.endSession(id!, {
+        rating: sessionRating || undefined,
+        feeling: sessionFeeling || undefined,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["session", id] });
       queryClient.invalidateQueries({ queryKey: ["my-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["feed-sessions"] });
+      setShowEndModal(false);
+      setSessionRating(0);
+      setSessionFeeling("");
     },
   });
 
@@ -183,7 +192,11 @@ export const SessionDetailPage = () => {
             </span>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                {session.gym?.name || session.crag?.name || "Climbing Session"}
+                {session.locationType === "indoor" ? "Indoor" : "Outdoor"}{" "}
+                climbing session
+                {session.gym?.name || session.crag?.name
+                  ? ` at ${session.gym?.name || session.crag?.name}`
+                  : ""}
               </h1>
               <p className="text-gray-600 mt-1">
                 {formatDate(session.startedAt)}
@@ -297,6 +310,32 @@ export const SessionDetailPage = () => {
               </button>
             )}
 
+            {/* Rating Display */}
+            {session.endedAt && session.rating && (
+              <div className="flex flex-col items-center gap-2 pt-4 border-t border-gray-200 w-full">
+                <span className="font-semibold text-gray-700">
+                  Session Rating
+                </span>
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-3xl">
+                      {i < session.rating! ? "⭐" : "☆"}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Feeling Display */}
+            {session.endedAt && session.feeling && (
+              <div className="flex flex-col items-center gap-2 pt-4 border-t border-gray-200 w-full">
+                <span className="font-semibold text-gray-700">How I Felt</span>
+                <p className="text-gray-900 text-center italic">
+                  "{session.feeling}"
+                </p>
+              </div>
+            )}
+
             {session.endedAt && !session.syncedToStrava && (
               <button
                 onClick={() => alert("Strava sync coming soon!")}
@@ -368,16 +407,51 @@ export const SessionDetailPage = () => {
       {/* End Session Confirmation Modal */}
       {showEndModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full">
-            <div className="text-center">
-              <div className="text-5xl mb-4">⏱️</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                End Session?
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to end this session? This will save all
-                your climbs and stop the timer.
-              </p>
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+            <div>
+              <div className="text-center">
+                <div className="text-5xl mb-4">⏱️</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  End Session
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Rate your session and share how you felt!
+                </p>
+              </div>
+
+              {/* Rating Section */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Rate the session (1-5)
+                </label>
+                <div className="flex justify-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setSessionRating(star)}
+                      className="text-4xl transition-transform hover:scale-110"
+                    >
+                      {star <= sessionRating ? "⭐" : "☆"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Feeling Section */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  How did you feel? (optional)
+                </label>
+                <textarea
+                  value={sessionFeeling}
+                  onChange={(e) => setSessionFeeling(e.target.value)}
+                  placeholder="Strong, tired, pumped, motivated..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+                  rows={3}
+                />
+              </div>
+
               <div className="space-y-3">
                 <button
                   onClick={() => {
@@ -400,20 +474,21 @@ export const SessionDetailPage = () => {
                     : "Discard Session"}
                 </button>
                 <button
-                  onClick={() => {
-                    endSessionMutation.mutate();
-                    setShowEndModal(false);
-                  }}
+                  onClick={() => endSessionMutation.mutate()}
                   disabled={
                     endSessionMutation.isPending ||
                     deleteSessionMutation.isPending
                   }
-                  className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-md font-medium transition-colors disabled:bg-gray-400"
+                  className="w-full bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-md font-medium transition-colors disabled:bg-gray-400"
                 >
                   {endSessionMutation.isPending ? "Ending..." : "End Session"}
                 </button>
                 <button
-                  onClick={() => setShowEndModal(false)}
+                  onClick={() => {
+                    setShowEndModal(false);
+                    setSessionRating(0);
+                    setSessionFeeling("");
+                  }}
                   disabled={
                     endSessionMutation.isPending ||
                     deleteSessionMutation.isPending

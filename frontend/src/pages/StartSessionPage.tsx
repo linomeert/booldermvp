@@ -98,10 +98,20 @@ export const StartSessionPage = () => {
       locationType: formData.locationType,
     };
 
-    if (formData.locationType === "indoor" && formData.gymId) {
-      data.gymId = formData.gymId;
-    } else if (formData.locationType === "outdoor" && formData.cragId) {
-      data.cragId = formData.cragId;
+    if (formData.locationType === "indoor") {
+      if (formData.gymId) {
+        data.gymId = formData.gymId;
+      } else if (locationInput.trim()) {
+        // Create new gym with the entered name
+        data.gymName = locationInput.trim();
+      }
+    } else if (formData.locationType === "outdoor") {
+      if (formData.cragId) {
+        data.cragId = formData.cragId;
+      } else if (locationInput.trim()) {
+        // Create new crag with the entered name
+        data.cragName = locationInput.trim();
+      }
     }
 
     createSessionMutation.mutate(data);

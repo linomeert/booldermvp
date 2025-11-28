@@ -21,7 +21,7 @@ export const FloatingActionButton = () => {
         {/* Mobile: Full circle popping from bottom nav */}
         <button
           onClick={() => navigate(`/sessions/${activeSession.id}`)}
-          className="md:hidden fixed bottom-14 left-1/2 -translate-x-1/2 z-50 bg-red-600 hover:bg-red-700 text-white w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+          className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-red-600 hover:bg-red-700 text-white w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
           title={`Active Session: ${
             activeSession.gym?.name || activeSession.crag?.name || "In Progress"
           }`}
@@ -58,7 +58,7 @@ export const FloatingActionButton = () => {
   return (
     <>
       {/* Mobile: Full circle popping from bottom nav */}
-      <div className="md:hidden fixed bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-3 z-50">
+      <div className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-3 z-50">
         {isOpen && (
           <div className="flex flex-col items-center space-y-2 mb-2">
             <Link

@@ -22,6 +22,8 @@ export const getNotifications = async (
       id: notif._id.toString(),
       fromUser: notif.fromUserId,
       fromUserId: notif.fromUserId?._id?.toString() || notif.fromUserId,
+      sessionId: notif.sessionId?._id?.toString() || notif.sessionId,
+      commentId: notif.commentId?._id?.toString() || notif.commentId,
     }));
 
     res.json(transformedNotifications);
