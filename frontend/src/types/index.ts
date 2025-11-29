@@ -66,6 +66,8 @@ export interface Gym {
   name: string;
   city?: string;
   country?: string;
+  address?: string;
+  grading?: string[];
 }
 
 export interface Crag {

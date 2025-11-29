@@ -13,6 +13,7 @@ export const LogClimbPage = () => {
   const { user } = useAuth();
 
   const [gradeType, setGradeType] = useState<"us" | "fr" | "color">("us");
+  const [customGrading, setCustomGrading] = useState<string[] | null>(null);
   const [climberId, setClimberId] = useState<string>("");
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -107,6 +108,14 @@ export const LogClimbPage = () => {
     queryFn: () => api.getSessionById(sessionIdFromUrl!),
     enabled: !!sessionIdFromUrl,
   });
+
+  useEffect(() => {
+    if (currentSession?.gym?.grading && currentSession.gym.grading.length > 0) {
+      setCustomGrading(currentSession.gym.grading);
+    } else {
+      setCustomGrading(null);
+    }
+  }, [currentSession]);
 
   // Pre-fill location data from session and initialize climber as current user
   useEffect(() => {
@@ -377,110 +386,150 @@ export const LogClimbPage = () => {
             <label className="block text-base font-semibold text-gray-900 mb-3">
               Grade *
             </label>
-
-            {/* Grade Type Tabs */}
-            <div className="flex border-b border-gray-200 mb-3">
-              <button
-                type="button"
-                onClick={() => setGradeType("us")}
-                className={`px-4 py-2 font-medium transition-colors ${
-                  gradeType === "us"
-                    ? "text-primary-600 border-b-2 border-primary-600"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                US (V-Scale)
-              </button>
-              <button
-                type="button"
-                onClick={() => setGradeType("fr")}
-                className={`px-4 py-2 font-medium transition-colors ${
-                  gradeType === "fr"
-                    ? "text-primary-600 border-b-2 border-primary-600"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                FR (Fontainebleau)
-              </button>
-              <button
-                type="button"
-                onClick={() => setGradeType("color")}
-                className={`px-4 py-2 font-medium transition-colors ${
-                  gradeType === "color"
-                    ? "text-primary-600 border-b-2 border-primary-600"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Color
-              </button>
-            </div>
-
-            {/* Grade Selection */}
-            <div className="grid grid-cols-6 gap-2">
-              {gradeType === "us" &&
-                usGrades.map((grade) => (
+            {customGrading && customGrading.length > 0 ? (
+              <div className="grid grid-cols-7 gap-2 py-2">
+                {customGrading.map((grade) => {
+                  // Map color names to tailwind classes
+                  const colorMap: Record<string, string> = {
+                    white: "bg-white border-2 border-gray-300",
+                    yellow: "bg-yellow-400",
+                    orange: "bg-orange-500",
+                    green: "bg-green-600",
+                    blue: "bg-blue-600",
+                    red: "bg-red-600",
+                    purple: "bg-purple-600",
+                    black: "bg-gray-900",
+                    pink: "bg-pink-600",
+                  };
+                  const colorKey = grade.toLowerCase();
+                  return (
+                    <button
+                      key={grade}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, grade })}
+                      className={`flex items-center justify-center w-8 h-8 rounded-full shadow-md transition-all border-2
+                        ${
+                          formData.grade === grade
+                            ? "ring-2 ring-primary-600 ring-offset-1 scale-110"
+                            : "hover:scale-105"
+                        }
+                        ${colorMap[colorKey] || "bg-gray-200"}`}
+                      aria-label={grade}
+                    >
+                      {/* No text, just color */}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                {/* Grade Type Tabs */}
+                <div className="flex border-b border-gray-200 mb-3">
                   <button
-                    key={grade}
                     type="button"
-                    onClick={() => setFormData({ ...formData, grade })}
-                    className={`py-3 px-2 rounded-lg font-semibold transition-all ${
-                      formData.grade === grade
-                        ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    onClick={() => setGradeType("us")}
+                    className={`px-4 py-2 font-medium transition-colors ${
+                      gradeType === "us"
+                        ? "text-primary-600 border-b-2 border-primary-600"
+                        : "text-gray-600 hover:text-gray-900"
                     }`}
                   >
-                    {grade}
+                    US (V-Scale)
                   </button>
-                ))}
-              {gradeType === "fr" &&
-                frGrades.map((grade) => (
                   <button
-                    key={grade}
                     type="button"
-                    onClick={() => setFormData({ ...formData, grade })}
-                    className={`py-3 px-2 rounded-lg font-semibold transition-all ${
-                      formData.grade === grade
-                        ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    onClick={() => setGradeType("fr")}
+                    className={`px-4 py-2 font-medium transition-colors ${
+                      gradeType === "fr"
+                        ? "text-primary-600 border-b-2 border-primary-600"
+                        : "text-gray-600 hover:text-gray-900"
                     }`}
                   >
-                    {grade}
+                    FR (Fontainebleau)
                   </button>
-                ))}
-              {gradeType === "color" &&
-                colors.map((color) => (
                   <button
-                    key={color}
                     type="button"
-                    onClick={() => setFormData({ ...formData, grade: color })}
-                    className="p-2 transition-all flex items-center justify-center"
+                    onClick={() => setGradeType("color")}
+                    className={`px-4 py-2 font-medium transition-colors ${
+                      gradeType === "color"
+                        ? "text-primary-600 border-b-2 border-primary-600"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
                   >
-                    <div
-                      className={`w-14 h-14 rounded-full shadow-md transition-all ${
-                        formData.grade === color
-                          ? "ring-4 ring-primary-600 ring-offset-2 scale-110"
-                          : "hover:scale-105"
-                      } ${
-                        color === "White"
-                          ? "bg-white border-2 border-gray-300"
-                          : color === "Yellow"
-                          ? "bg-yellow-400"
-                          : color === "Orange"
-                          ? "bg-orange-500"
-                          : color === "Green"
-                          ? "bg-green-600"
-                          : color === "Blue"
-                          ? "bg-blue-600"
-                          : color === "Red"
-                          ? "bg-red-600"
-                          : color === "Purple"
-                          ? "bg-purple-600"
-                          : "bg-gray-900"
-                      }`}
-                    />
+                    Color
                   </button>
-                ))}
-            </div>
+                </div>
+
+                {/* Grade Selection */}
+                <div className="grid grid-cols-6 gap-2">
+                  {gradeType === "us" &&
+                    usGrades.map((grade) => (
+                      <button
+                        key={grade}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, grade })}
+                        className={`py-3 px-2 rounded-lg font-semibold transition-all ${
+                          formData.grade === grade
+                            ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {grade}
+                      </button>
+                    ))}
+                  {gradeType === "fr" &&
+                    frGrades.map((grade) => (
+                      <button
+                        key={grade}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, grade })}
+                        className={`py-3 px-2 rounded-lg font-semibold transition-all ${
+                          formData.grade === grade
+                            ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {grade}
+                      </button>
+                    ))}
+                  {gradeType === "color" &&
+                    colors.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() =>
+                          setFormData({ ...formData, grade: color })
+                        }
+                        className="p-2 transition-all flex items-center justify-center"
+                      >
+                        <div
+                          className={`w-14 h-14 rounded-full shadow-md transition-all ${
+                            formData.grade === color
+                              ? "ring-4 ring-primary-600 ring-offset-2 scale-110"
+                              : "hover:scale-105"
+                          } ${
+                            color === "White"
+                              ? "bg-white border-2 border-gray-300"
+                              : color === "Yellow"
+                              ? "bg-yellow-400"
+                              : color === "Orange"
+                              ? "bg-orange-500"
+                              : color === "Green"
+                              ? "bg-green-600"
+                              : color === "Blue"
+                              ? "bg-blue-600"
+                              : color === "Red"
+                              ? "bg-red-600"
+                              : color === "Purple"
+                              ? "bg-purple-600"
+                              : "bg-gray-900"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                </div>
+              </>
+            )}
             {!formData.grade && (
               <p className="mt-2 text-sm text-red-600">Please select a grade</p>
             )}

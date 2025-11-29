@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap');
+
+/* Bagel Fat One font utility */
+.bagel-font {
+  font-family: 'Bagel Fat One', cursive;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

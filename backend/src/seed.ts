@@ -34,29 +34,38 @@ async function main() {
   await Gym.deleteMany({});
   await Crag.deleteMany({});
 
-  // Create gyms
+
+  // Create Brussels gyms with grading
   const gym1 = await Gym.create({
-    name: 'Boulder Central',
-    city: 'Amsterdam',
-    country: 'Netherlands',
+    name: 'Arkose Canal',
+    address: 'Allée Verte 52, 1000 Brussels, Belgium',
+    grading: ['yellow', 'green', 'blue', 'red', 'black', 'purple'],
+    city: 'Brussels',
+    country: 'Belgium',
   });
 
   const gym2 = await Gym.create({
-    name: 'Momentum Climbing',
-    city: 'Utrecht',
-    country: 'Netherlands',
+    name: 'Le Camp de Base',
+    address: 'Chaussée de Boondael 210C, 1050 Ixelles, Brussels, Belgium',
+    grading: ['green', 'orange', 'pink', 'black', 'blue', 'purple', 'yellow'],
+    city: 'Brussels',
+    country: 'Belgium',
   });
 
   const gym3 = await Gym.create({
-    name: 'The Climb',
-    city: 'Rotterdam',
-    country: 'Netherlands',
+    name: 'Petite Île',
+    address: 'Rue de la Petite-Île 1A, 1070 Anderlecht, Brussels, Belgium',
+    grading: ['green', 'orange', 'pink', 'black', 'blue', 'purple', 'yellow'],
+    city: 'Brussels',
+    country: 'Belgium',
   });
 
-  await Gym.create({
-    name: 'Petit ile',
-    city: 'Réunion',
-    country: 'France',
+  const gym4 = await Gym.create({
+    name: 'À Bloc',
+    address: 'Avenue Léonard Mommaerts 11, 1140 Evere, Brussels, Belgium',
+    grading: ['green', 'orange', 'pink', 'black', 'blue', 'purple', 'yellow'],
+    city: 'Brussels',
+    country: 'Belgium',
   });
 
   // Create crags

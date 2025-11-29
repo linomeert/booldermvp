@@ -1,15 +1,20 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+
 export interface IGym extends Document {
   name: string;
   city?: string;
   country?: string;
+  address?: string;
+  grading?: string[];
 }
 
 const GymSchema = new Schema<IGym>({
   name: { type: String, required: true },
   city: { type: String },
   country: { type: String },
+  address: { type: String },
+  grading: { type: [String], default: [] },
 });
 
 export const Gym = mongoose.model<IGym>('Gym', GymSchema);
