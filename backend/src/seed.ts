@@ -60,7 +60,7 @@ async function main() {
     country: 'Belgium',
   });
 
-  const gym4 = await Gym.create({
+  await Gym.create({
     name: 'À Bloc',
     address: 'Avenue Léonard Mommaerts 11, 1140 Evere, Brussels, Belgium',
     grading: ['green', 'orange', 'pink', 'black', 'blue', 'purple', 'yellow'],
