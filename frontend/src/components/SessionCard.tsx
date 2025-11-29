@@ -269,39 +269,6 @@ export const SessionCard = ({
           </div>
         )}
 
-        {/* Boulders images grid - above stats */}
-        {climbs.length > 0 && (
-          <div className="w-full overflow-x-auto mb-4">
-            <div className="flex flex-row" style={{ gap: 0, minWidth: 0 }}>
-              {climbs.map((climb) => {
-                const imgSrc =
-                  climb.images && climb.images.length > 0
-                    ? climb.images[0]
-                    : climb.mediaUrl;
-                if (!imgSrc) return null;
-                return (
-                  <Link
-                    key={climb.id}
-                    to={`/climbs/${climb.id}`}
-                    className="flex-shrink-0 relative"
-                    style={{
-                      width: "40%",
-                      aspectRatio: "1/1",
-                      marginRight: "-12%",
-                    }}
-                  >
-                    <img
-                      src={imgSrc}
-                      alt={`Climb ${climb.grade}`}
-                      className="w-full h-full object-cover rounded-lg border border-gray-200"
-                    />
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         <Link to={`/sessions/${session.id}`} className="block">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
@@ -362,59 +329,100 @@ export const SessionCard = ({
             )}
           </div>
 
+          {/* Custom grade summary grid */}
           <div className="grid grid-cols-4 gap-3 mb-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary-600">
-                {session.climbCount}
-              </div>
-              <div className="text-xs text-gray-600">Climbs</div>
-            </div>
-
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {session.topsCount}
-              </div>
-              <div className="text-xs text-gray-600">Tops</div>
-            </div>
-
-            <div className="text-center">
-              <div className="text-2xl font-bold text-amber-600">
-                {session.projectsCount}
-              </div>
-              <div className="text-xs text-gray-600">Projects</div>
-            </div>
-
-            <div className="text-center">
-              <div
-                className={`text-lg font-bold ${
-                  session.hardestGrade?.toLowerCase() === "white"
-                    ? "text-gray-800"
-                    : session.hardestGrade?.toLowerCase() === "yellow"
-                    ? "text-yellow-600"
-                    : session.hardestGrade?.toLowerCase() === "orange"
-                    ? "text-orange-600"
-                    : session.hardestGrade?.toLowerCase() === "green"
-                    ? "text-green-600"
-                    : session.hardestGrade?.toLowerCase() === "blue"
-                    ? "text-blue-600"
-                    : session.hardestGrade?.toLowerCase() === "red"
-                    ? "text-red-600"
-                    : session.hardestGrade?.toLowerCase() === "purple"
-                    ? "text-purple-600"
-                    : session.hardestGrade?.toLowerCase() === "black"
-                    ? "text-gray-900"
-                    : "text-purple-600"
-                }`}
-              >
-                {session.hardestGrade || "N/A"}
-              </div>
-              <div className="text-xs text-gray-600">Hardest</div>
-            </div>
+            {(() => {
+              // Count grades
+              const gradeCounts: Record<string, number> = {};
+              climbs.forEach((climb) => {
+                const grade = climb.grade;
+                if (!grade) return;
+                gradeCounts[grade] = (gradeCounts[grade] || 0) + 1;
+              });
+              // Sort grades by difficulty (try color order, fallback to string sort)
+              const colorOrder = [
+                "white",
+                "yellow",
+                "orange",
+                "green",
+                "blue",
+                "red",
+                "purple",
+                "black",
+              ];
+              const gradesSorted = Object.keys(gradeCounts)
+                .sort((a, b) => {
+                  const aIdx = colorOrder.indexOf(a.toLowerCase());
+                  const bIdx = colorOrder.indexOf(b.toLowerCase());
+                  if (aIdx !== -1 && bIdx !== -1) return bIdx - aIdx; // hardest first
+                  if (aIdx !== -1) return 1;
+                  if (bIdx !== -1) return -1;
+                  return b.localeCompare(a); // fallback: string sort desc
+                })
+                .slice(0, 4);
+              // Color mapping for circles
+              const colorCircleMap: Record<string, string> = {
+                white: "bg-white border border-gray-300 text-gray-800",
+                yellow: "bg-yellow-400 text-yellow-900",
+                orange: "bg-orange-500 text-white",
+                green: "bg-green-600 text-white",
+                blue: "bg-blue-600 text-white",
+                red: "bg-red-600 text-white",
+                purple: "bg-purple-600 text-white",
+                black: "bg-gray-900 text-white",
+              };
+              return gradesSorted.map((grade) => {
+                const count = gradeCounts[grade];
+                const colorKey = grade.toLowerCase();
+                const isColorGrade = colorCircleMap[colorKey] !== undefined;
+                const isVGrade = /^v\d+$/i.test(grade);
+                return (
+                  <div
+                    key={grade}
+                    className="flex flex-col items-center justify-center"
+                  >
+                    {isColorGrade ? (
+                      <span
+                        className={`w-7 h-7 p-4 bagel-font rounded-full flex items-center justify-center mb-1 font-bold text-xl ${colorCircleMap[colorKey]}`}
+                      >
+                        {count}
+                      </span>
+                    ) : isVGrade ? (
+                      <span className="w-7 h-7 bagel-font rounded-full flex items-center justify-center mb-1 text-xl font-bold text-gray-700 ">
+                        {grade.toUpperCase()}
+                      </span>
+                    ) : (
+                      <span className="w-7 h-7 rounded-full border-2 border-gray-300 flex items-center justify-center mb-1 text-m font-bold text-gray-700">
+                        {grade}
+                      </span>
+                    )}
+                    {!isColorGrade && (
+                      <span className="font-bold text-base text-gray-400">
+                        {count}
+                      </span>
+                    )}
+                  </div>
+                );
+              });
+            })()}
           </div>
 
-          <div className="text-sm text-gray-600 border-t pt-3">
-            <span className="font-semibold">Duration:</span>{" "}
-            {formatDuration(session.durationSeconds)}
+          <div className="text-sm text-gray-600 border-t pt-3 flex justify-between gap-4">
+            <span>
+              <span className="font-semibold">Duration:</span>{" "}
+              {formatDuration(session.durationSeconds)}
+            </span>
+            <span>
+              <span className="font-semibold">Total tops:</span>{" "}
+              {climbs.filter((c) => c.status === "top").length}
+            </span>
+            <span>
+              <span className="font-semibold">Total flashes:</span>{" "}
+              {
+                climbs.filter((c) => c.status === "top" && c.attempts === 1)
+                  .length
+              }
+            </span>
             {session.syncedToStrava && (
               <span className="ml-3 text-orange-600">🏃 Strava</span>
             )}
@@ -579,19 +587,12 @@ export const SessionCard = ({
                     )}
                   </div>
                 )}
-                <div className="p-2 flex items-center justify-between">
-                  {climb.status === "project" ? (
-                    <span className="text-xs text-gray-600">project</span>
-                  ) : (
-                    <>
-                      {climb.attempts === 1 && (
-                        <span className="text-xs font-bold text-orange-600">
-                          ⚡ Flash!
-                        </span>
-                      )}
-                    </>
-                  )}
-                </div>
+                {/* Overlay Flash label on image or color block */}
+                {climb.attempts === 1 && climb.status === "top" && (
+                  <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 rounded px-2 py-1 flex items-center gap-1 shadow text-xs font-bold text-orange-600 z-10">
+                    <span>⚡</span> Flash!
+                  </div>
+                )}
               </Link>
             ))}
           </div>
