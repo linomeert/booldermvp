@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { getNotifications } from "../api";
+import Logo from "./Logo";
 
 export const Navbar = () => {
   const { user, logout } = useAuth();
@@ -36,7 +37,6 @@ export const Navbar = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2">
-                <span className="text-2xl">🧗</span>
                 <span className="text-xl font-bold text-gray-900">
                   Climbing Log
                 </span>
@@ -131,7 +131,7 @@ export const Navbar = () => {
       <div className="md:hidden bg-white shadow-md">
         <div className="px-4 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl">🧗</span>
+            <Logo />
             <span className="text-lg font-bold text-gray-900">
               Climbing Log
             </span>

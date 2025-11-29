@@ -11,6 +11,8 @@ import {
   deleteComment,
 } from "../api";
 import { useAuth } from "../context/AuthContext";
+import indoor from "../assets/indoor.png";
+import outdoor from "../assets/outdoor.png";
 
 interface SessionCardProps {
   session: Session;
@@ -246,8 +248,8 @@ export const SessionCard = ({
                     (participant: any, index: number) => (
                       <Link
                         key={participant.id || participant}
-                        to={`/profile/${
-                          typeof participant === "object"
+                        to={`/profile/$
+                          {typeof participant === "object"
                             ? participant.username
                             : participant
                         }`}
@@ -267,11 +269,56 @@ export const SessionCard = ({
           </div>
         )}
 
+        {/* Boulders images grid - above stats */}
+        {climbs.length > 0 && (
+          <div className="w-full overflow-x-auto mb-4">
+            <div className="flex flex-row" style={{ gap: 0, minWidth: 0 }}>
+              {climbs.map((climb) => {
+                const imgSrc =
+                  climb.images && climb.images.length > 0
+                    ? climb.images[0]
+                    : climb.mediaUrl;
+                if (!imgSrc) return null;
+                return (
+                  <Link
+                    key={climb.id}
+                    to={`/climbs/${climb.id}`}
+                    className="flex-shrink-0 relative"
+                    style={{
+                      width: "40%",
+                      aspectRatio: "1/1",
+                      marginRight: "-12%",
+                    }}
+                  >
+                    <img
+                      src={imgSrc}
+                      alt={`Climb ${climb.grade}`}
+                      className="w-full h-full object-cover rounded-lg border border-gray-200"
+                    />
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <Link to={`/sessions/${session.id}`} className="block">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
               <span className="text-3xl">
-                {session.locationType === "indoor" ? "🏢" : "⛰️"}
+                {session.locationType === "indoor" ? (
+                  <img
+                    src={indoor}
+                    alt="Indoor holds"
+                    className="w-8 h-8 inline-block align-middle"
+                  />
+                ) : (
+                  <img
+                    src={outdoor}
+                    alt="Outdoor rocks"
+                    className="w-8 h-8 inline-block align-middle"
+                  />
+                )}
               </span>
               <div className="flex-1">
                 <h3 className="font-bold text-lg text-gray-900">

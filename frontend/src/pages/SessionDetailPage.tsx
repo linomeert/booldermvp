@@ -170,10 +170,20 @@ export const SessionDetailPage = () => {
   };
 
   return (
+
     <div className="max-w-5xl mx-auto py-8 px-4">
+      {/* Active Session Timer Bubble - Only timer, no icon or dot */}
+      {!session.endedAt && (
+        <div className="sticky top-0 z-40 flex justify-center mb-4">
+          <div className="bg-red-600 text-white font-mono text-2xl px-8 py-2 rounded-full shadow-lg border-4 border-white">
+            {formatDuration(currentDuration)}
+          </div>
+        </div>
+      )}
+
       {/* Add Climb Button - Sticky at top for active sessions */}
       {!session.endedAt && (
-        <div className="sticky top-0 z-30 mb-4">
+        <div className="sticky top-14 z-30 mb-4">
           <Link
             to={`/log?sessionId=${id}`}
             className="w-full bg-primary-600 hover:bg-primary-700 text-white py-4 rounded-lg font-bold text-lg shadow-lg flex items-center justify-center gap-3 transition-colors"
@@ -295,9 +305,6 @@ export const SessionDetailPage = () => {
                     : session.durationSeconds || 0
                 )}
               </div>
-              {!session.endedAt && (
-                <span className="inline-flex h-3 w-3 animate-pulse rounded-full bg-red-500"></span>
-              )}
             </div>
 
             {!session.endedAt && (

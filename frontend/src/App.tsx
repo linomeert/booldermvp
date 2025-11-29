@@ -8,7 +8,7 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { FeedPage } from "./pages/FeedPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { SessionDetailPage } from "./pages/SessionDetailPage";
-import { StartSessionPage } from "./pages/StartSessionPage";
+import StartSessionPage from "./pages/StartSessionPage";
 import { LogClimbPage } from "./pages/LogClimbPage";
 import { ClimbDetailPage } from "./pages/ClimbDetailPage";
 import { SearchUsersPage } from "./pages/SearchUsersPage";

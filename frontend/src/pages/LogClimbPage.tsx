@@ -222,414 +222,431 @@ export const LogClimbPage = () => {
   console.log("Active sessions:", activeSessions);
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Log Climb</h1>
-
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-lg shadow-md p-6 space-y-6"
-      >
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Status
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, status: "top" })}
-              className={`py-3 px-4 rounded-lg font-medium transition-colors ${
-                formData.status === "top"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              ✓ Top
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, status: "project" })}
-              className={`py-3 px-4 rounded-lg font-medium transition-colors ${
-                formData.status === "project"
-                  ? "bg-amber-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              📍 Project
-            </button>
-          </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center md:justify-center z-50">
+      {/* Mobile: Bottom Sheet | Desktop: Center Modal */}
+      <div className="bg-white w-full md:max-w-2xl md:mx-4 rounded-t-3xl md:rounded-2xl max-h-[90vh] overflow-hidden flex flex-col animate-slide-up">
+        {/* Handle bar (mobile only) */}
+        <div className="flex justify-center pt-3 pb-2 md:hidden">
+          <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
         </div>
 
-        {/* Climber selector for shared sessions */}
-        {currentSession &&
-          currentSession.participants &&
-          currentSession.participants.length > 0 && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Climber
-              </label>
-              <select
-                value={climberId}
-                onChange={(e) => setClimberId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value={user?.id || ""}>{user?.name || "Me"}</option>
-                {currentSession.participants.map((participant: any) => (
-                  <option
-                    key={participant.id || participant}
-                    value={participant.id || participant}
-                  >
-                    {typeof participant === "object"
-                      ? participant.name
-                      : participant}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-        {!sessionIdFromUrl && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location Type
-              </label>
-              <select
-                value={formData.locationType}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    locationType: e.target.value as LocationType,
-                    gymId: "",
-                    cragId: "",
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              >
-                <option value="indoor">Indoor</option>
-                <option value="outdoor">Outdoor</option>
-              </select>
-            </div>
-
-            {formData.locationType === "indoor" ? (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gym
-                </label>
-                <select
-                  value={formData.gymId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, gymId: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                >
-                  <option value="">Select a gym</option>
-                  {gyms?.map((gym) => (
-                    <option key={gym.id} value={gym.id}>
-                      {gym.name} {gym.city && `- ${gym.city}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Crag
-                </label>
-                <select
-                  value={formData.cragId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, cragId: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                >
-                  <option value="">Select a crag</option>
-                  {crags?.map((crag) => (
-                    <option key={crag.id} value={crag.id}>
-                      {crag.name} {crag.area && `- ${crag.area}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </>
-        )}
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Grade *
-          </label>
-
-          {/* Grade Type Tabs */}
-          <div className="flex border-b border-gray-200 mb-3">
-            <button
-              type="button"
-              onClick={() => setGradeType("us")}
-              className={`px-4 py-2 font-medium transition-colors ${
-                gradeType === "us"
-                  ? "text-primary-600 border-b-2 border-primary-600"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              US (V-Scale)
-            </button>
-            <button
-              type="button"
-              onClick={() => setGradeType("fr")}
-              className={`px-4 py-2 font-medium transition-colors ${
-                gradeType === "fr"
-                  ? "text-primary-600 border-b-2 border-primary-600"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              FR (Fontainebleau)
-            </button>
-            <button
-              type="button"
-              onClick={() => setGradeType("color")}
-              className={`px-4 py-2 font-medium transition-colors ${
-                gradeType === "color"
-                  ? "text-primary-600 border-b-2 border-primary-600"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Color
-            </button>
-          </div>
-
-          {/* Grade Selection */}
-          <div className="grid grid-cols-6 gap-2">
-            {gradeType === "us" &&
-              usGrades.map((grade) => (
-                <button
-                  key={grade}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, grade })}
-                  className={`py-3 px-2 rounded-lg font-semibold transition-all ${
-                    formData.grade === grade
-                      ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {grade}
-                </button>
-              ))}
-            {gradeType === "fr" &&
-              frGrades.map((grade) => (
-                <button
-                  key={grade}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, grade })}
-                  className={`py-3 px-2 rounded-lg font-semibold transition-all ${
-                    formData.grade === grade
-                      ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {grade}
-                </button>
-              ))}
-            {gradeType === "color" &&
-              colors.map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, grade: color })}
-                  className="p-2 transition-all flex items-center justify-center"
-                >
-                  <div
-                    className={`w-14 h-14 rounded-full shadow-md transition-all ${
-                      formData.grade === color
-                        ? "ring-4 ring-primary-600 ring-offset-2 scale-110"
-                        : "hover:scale-105"
-                    } ${
-                      color === "White"
-                        ? "bg-white border-2 border-gray-300"
-                        : color === "Yellow"
-                        ? "bg-yellow-400"
-                        : color === "Orange"
-                        ? "bg-orange-500"
-                        : color === "Green"
-                        ? "bg-green-600"
-                        : color === "Blue"
-                        ? "bg-blue-600"
-                        : color === "Red"
-                        ? "bg-red-600"
-                        : color === "Purple"
-                        ? "bg-purple-600"
-                        : "bg-gray-900"
-                    }`}
-                  />
-                </button>
-              ))}
-          </div>
-          {!formData.grade && (
-            <p className="mt-2 text-sm text-red-600">Please select a grade</p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Style
-            </label>
-            <input
-              type="text"
-              value={formData.style}
-              onChange={(e) =>
-                setFormData({ ...formData, style: e.target.value })
-              }
-              placeholder="e.g., flash, onsight, redpoint"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Attempts
-            </label>
-            <input
-              type="number"
-              min="1"
-              value={formData.attempts}
-              onChange={(e) =>
-                setFormData({ ...formData, attempts: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-            />
-          </div>
-        </div>
-
-        {!sessionIdFromUrl && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Add to Session (optional)
-            </label>
-            <select
-              value={formData.sessionId}
-              onChange={(e) =>
-                setFormData({ ...formData, sessionId: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-            >
-              <option value="">No session</option>
-              {sessionsLoading && <option disabled>Loading sessions...</option>}
-              {!sessionsLoading &&
-                activeSessions.map((session: any) => (
-                  <option
-                    key={session.id || session._id}
-                    value={session.id || session._id}
-                  >
-                    {session.gym?.name ||
-                      session.crag?.name ||
-                      (session.locationType === "indoor"
-                        ? "Indoor Session"
-                        : "Outdoor Session")}{" "}
-                    - {new Date(session.startedAt).toLocaleDateString()}
-                  </option>
-                ))}
-            </select>
-            {!sessionsLoading && activeSessions.length === 0 && (
-              <p className="mt-1 text-sm text-gray-500">
-                No active sessions. Sessions help track multiple climbs
-                together.
-              </p>
-            )}
-          </div>
-        )}
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Media URL
-          </label>
-          <input
-            type="url"
-            value={formData.mediaUrl}
-            onChange={(e) =>
-              setFormData({ ...formData, mediaUrl: e.target.value })
-            }
-            placeholder="https://..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            📷 Photos
-          </label>
-          <div className="space-y-3">
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              capture="environment"
-              onChange={handleImageUpload}
-              disabled={uploading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-            />
-            {uploading && (
-              <p className="text-sm text-gray-500">Uploading images...</p>
-            )}
-            {images.length > 0 && (
-              <div className="grid grid-cols-3 gap-2">
-                {images.map((url, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={url}
-                      alt={`Upload ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Notes
-          </label>
-          <textarea
-            value={formData.notes}
-            onChange={(e) =>
-              setFormData({ ...formData, notes: e.target.value })
-            }
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-          />
-        </div>
-
-        <div className="flex space-x-4">
-          <button
-            type="submit"
-            disabled={createClimbMutation.isPending}
-            className="flex-1 bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50"
-          >
-            {createClimbMutation.isPending ? "Logging..." : "Log Climb"}
-          </button>
-
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h1 className="text-xl font-bold text-gray-900">Add New Climb</h1>
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
           >
-            Cancel
+            ×
           </button>
         </div>
 
-        {createClimbMutation.isError && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
-            Failed to log climb. Please try again.
+        {/* Scrollable Form Content */}
+        <form
+          id="climb-form"
+          onSubmit={handleSubmit}
+          className="flex-1 overflow-y-auto px-6 py-4 space-y-6"
+        >
+          <div>
+            <label className="block text-base font-semibold text-gray-900 mb-3">
+              Status
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, status: "top" })}
+                className={`py-3 px-4 rounded-2xl font-medium transition-colors ${
+                  formData.status === "top"
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                ✓ Top
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, status: "project" })}
+                className={`py-3 px-4 rounded-2xl font-medium transition-colors ${
+                  formData.status === "project"
+                    ? "bg-amber-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                📍 Project
+              </button>
+            </div>
           </div>
-        )}
-      </form>
+
+          {/* Climber selector for shared sessions */}
+          {currentSession &&
+            currentSession.participants &&
+            currentSession.participants.length > 0 && (
+              <div>
+                <label className="block text-base font-semibold text-gray-900 mb-3">
+                  Climber
+                </label>
+                <select
+                  value={climberId}
+                  onChange={(e) => setClimberId(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
+                >
+                  <option value={user?.id || ""}>{user?.name || "Me"}</option>
+                  {currentSession.participants.map((participant: any) => (
+                    <option
+                      key={participant.id || participant}
+                      value={participant.id || participant}
+                    >
+                      {typeof participant === "object"
+                        ? participant.name
+                        : participant}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+          {!sessionIdFromUrl && (
+            <>
+              <div>
+                <label className="block text-base font-semibold text-gray-900 mb-3">
+                  Location Type
+                </label>
+                <select
+                  value={formData.locationType}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      locationType: e.target.value as LocationType,
+                      gymId: "",
+                      cragId: "",
+                    })
+                  }
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
+                >
+                  <option value="indoor">Indoor</option>
+                  <option value="outdoor">Outdoor</option>
+                </select>
+              </div>
+
+              {formData.locationType === "indoor" ? (
+                <div>
+                  <label className="block text-base font-semibold text-gray-900 mb-3">
+                    Gym
+                  </label>
+                  <select
+                    value={formData.gymId}
+                    onChange={(e) =>
+                      setFormData({ ...formData, gymId: e.target.value })
+                    }
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
+                  >
+                    <option value="">Select a gym</option>
+                    {gyms?.map((gym) => (
+                      <option key={gym.id} value={gym.id}>
+                        {gym.name} {gym.city && `- ${gym.city}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-base font-semibold text-gray-900 mb-3">
+                    Crag
+                  </label>
+                  <select
+                    value={formData.cragId}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cragId: e.target.value })
+                    }
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
+                  >
+                    <option value="">Select a crag</option>
+                    {crags?.map((crag) => (
+                      <option key={crag.id} value={crag.id}>
+                        {crag.name} {crag.area && `- ${crag.area}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </>
+          )}
+
+          <div>
+            <label className="block text-base font-semibold text-gray-900 mb-3">
+              Grade *
+            </label>
+
+            {/* Grade Type Tabs */}
+            <div className="flex border-b border-gray-200 mb-3">
+              <button
+                type="button"
+                onClick={() => setGradeType("us")}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  gradeType === "us"
+                    ? "text-primary-600 border-b-2 border-primary-600"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                US (V-Scale)
+              </button>
+              <button
+                type="button"
+                onClick={() => setGradeType("fr")}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  gradeType === "fr"
+                    ? "text-primary-600 border-b-2 border-primary-600"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                FR (Fontainebleau)
+              </button>
+              <button
+                type="button"
+                onClick={() => setGradeType("color")}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  gradeType === "color"
+                    ? "text-primary-600 border-b-2 border-primary-600"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                Color
+              </button>
+            </div>
+
+            {/* Grade Selection */}
+            <div className="grid grid-cols-6 gap-2">
+              {gradeType === "us" &&
+                usGrades.map((grade) => (
+                  <button
+                    key={grade}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, grade })}
+                    className={`py-3 px-2 rounded-lg font-semibold transition-all ${
+                      formData.grade === grade
+                        ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {grade}
+                  </button>
+                ))}
+              {gradeType === "fr" &&
+                frGrades.map((grade) => (
+                  <button
+                    key={grade}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, grade })}
+                    className={`py-3 px-2 rounded-lg font-semibold transition-all ${
+                      formData.grade === grade
+                        ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {grade}
+                  </button>
+                ))}
+              {gradeType === "color" &&
+                colors.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, grade: color })}
+                    className="p-2 transition-all flex items-center justify-center"
+                  >
+                    <div
+                      className={`w-14 h-14 rounded-full shadow-md transition-all ${
+                        formData.grade === color
+                          ? "ring-4 ring-primary-600 ring-offset-2 scale-110"
+                          : "hover:scale-105"
+                      } ${
+                        color === "White"
+                          ? "bg-white border-2 border-gray-300"
+                          : color === "Yellow"
+                          ? "bg-yellow-400"
+                          : color === "Orange"
+                          ? "bg-orange-500"
+                          : color === "Green"
+                          ? "bg-green-600"
+                          : color === "Blue"
+                          ? "bg-blue-600"
+                          : color === "Red"
+                          ? "bg-red-600"
+                          : color === "Purple"
+                          ? "bg-purple-600"
+                          : "bg-gray-900"
+                      }`}
+                    />
+                  </button>
+                ))}
+            </div>
+            {!formData.grade && (
+              <p className="mt-2 text-sm text-red-600">Please select a grade</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-base font-semibold text-gray-900 mb-3">
+                Style
+              </label>
+              <input
+                type="text"
+                value={formData.style}
+                onChange={(e) =>
+                  setFormData({ ...formData, style: e.target.value })
+                }
+                placeholder="e.g., flash, onsight"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700 placeholder:text-gray-400"
+              />
+            </div>
+
+            <div>
+              <label className="block text-base font-semibold text-gray-900 mb-3">
+                Attempts
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={formData.attempts}
+                onChange={(e) =>
+                  setFormData({ ...formData, attempts: e.target.value })
+                }
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
+              />
+            </div>
+          </div>
+
+          {!sessionIdFromUrl && (
+            <div>
+              <label className="block text-base font-semibold text-gray-900 mb-3">
+                Add to Session (optional)
+              </label>
+              <select
+                value={formData.sessionId}
+                onChange={(e) =>
+                  setFormData({ ...formData, sessionId: e.target.value })
+                }
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
+              >
+                <option value="">No session</option>
+                {sessionsLoading && (
+                  <option disabled>Loading sessions...</option>
+                )}
+                {!sessionsLoading &&
+                  activeSessions.map((session: any) => (
+                    <option
+                      key={session.id || session._id}
+                      value={session.id || session._id}
+                    >
+                      {session.gym?.name ||
+                        session.crag?.name ||
+                        (session.locationType === "indoor"
+                          ? "Indoor Session"
+                          : "Outdoor Session")}{" "}
+                      - {new Date(session.startedAt).toLocaleDateString()}
+                    </option>
+                  ))}
+              </select>
+              {!sessionsLoading && activeSessions.length === 0 && (
+                <p className="mt-1 text-sm text-gray-500">
+                  No active sessions. Sessions help track multiple climbs
+                  together.
+                </p>
+              )}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-base font-semibold text-gray-900 mb-3">
+              Media URL
+            </label>
+            <input
+              type="url"
+              value={formData.mediaUrl}
+              onChange={(e) =>
+                setFormData({ ...formData, mediaUrl: e.target.value })
+              }
+              placeholder="https://..."
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700 placeholder:text-gray-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-base font-semibold text-gray-900 mb-3">
+              📷 Photos
+            </label>
+            <div className="space-y-3">
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                capture="environment"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+              />
+              {uploading && (
+                <p className="text-sm text-gray-500">Uploading images...</p>
+              )}
+              {images.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {images.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`Upload ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-base font-semibold text-gray-900 mb-3">
+              Notes
+            </label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
+              rows={3}
+              placeholder="What was this for?"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700 placeholder:text-gray-400 resize-none"
+            />
+          </div>
+
+          {createClimbMutation.isError && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+              Failed to log climb. Please try again.
+            </div>
+          )}
+        </form>
+
+        {/* Fixed Bottom Button */}
+        <div className="border-t border-gray-200 px-6 py-4 bg-white">
+          <button
+            type="submit"
+            form="climb-form"
+            disabled={createClimbMutation.isPending}
+            className="w-full bg-gray-900 text-white py-4 px-6 rounded-2xl hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 font-medium text-lg"
+          >
+            {createClimbMutation.isPending ? "Adding..." : "Add Climb"}
+          </button>
+        </div>
+      </div>
 
       {/* Success Modal */}
       {showSuccess && (
