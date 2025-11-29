@@ -176,7 +176,7 @@ export const SessionDetailPage = () => {
         <div className="sticky top-14 z-30 mb-4">
           <Link
             to={`/log?sessionId=${id}`}
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white py-4 rounded-lg font-bold text-lg shadow-lg flex items-center justify-center gap-3 transition-colors"
+            className="w-full bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg shadow-lg p-6 text-white py-4 rounded-lg font-bold text-lg shadow-lg flex items-center justify-center gap-3 transition-colors"
           >
             <span className="text-2xl">+</span>
             <span>Add Climb</span>
@@ -209,12 +209,12 @@ export const SessionDetailPage = () => {
         {!session.endedAt && session.participants && (
           <div className="mb-6 pb-6 border-b border-gray-200">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Climbing with
+              <h3 className="text-sm font-semibold text-gray-900">
+                Are you climbing with your crew?
               </h3>
               <button
                 onClick={() => setShowAddFriendModal(true)}
-                className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+                className="bg-white border-2 border-primary-600 text-primary-600 hover:bg-primary-50 hover:text-primary-700 px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
               >
                 <span>+</span>
                 <span>Add Friend</span>
@@ -245,7 +245,7 @@ export const SessionDetailPage = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm">No friends added yet</p>
+              <p className="text-gray-500 text-sm">Solo sesh for now</p>
             )}
           </div>
         )}

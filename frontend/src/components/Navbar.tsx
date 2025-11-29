@@ -37,8 +37,8 @@ export const Navbar = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-gray-900">
-                  Climbing Log
+                <span className="text-xl font-bold text-gray-900 alfa-font">
+                  Bldr
                 </span>
               </Link>
             </div>
@@ -132,9 +132,7 @@ export const Navbar = () => {
         <div className="px-4 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
             <Logo />
-            <span className="text-lg font-bold text-gray-900">
-              Climbing Log
-            </span>
+            <span className="text-xl alfa-font text-gray-900">Bldr</span>
           </Link>
           {user && (
             <button

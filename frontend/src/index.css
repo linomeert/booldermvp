@@ -1,4 +1,10 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap');
+/* Alfa Slab One font utility */
+.alfa-font {
+  font-family: 'Alfa Slab One', cursive;
+}
 
 /* Bagel Fat One font utility */
 .bagel-font {

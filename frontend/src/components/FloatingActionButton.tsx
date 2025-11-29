@@ -51,11 +51,11 @@ export const FloatingActionButton = () => {
   return (
     <>
       {/* Mobile: Full circle popping from bottom nav */}
-      <div className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-3 z-50">
+      <div className="md:hidden fixed bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-3 z-50">
         {isOpen && (
           <div className="flex flex-col items-center space-y-2 mb-2">
             <button
-              className="bg-white hover:bg-gray-50 text-gray-700 rounded-full px-4 py-3 flex items-center shadow-lg gap-2 transition-transform hover:scale-105"
+              className="bg-gradient-to-r from-primary-500 via-primary-600 to-blue-500 hover:from-primary-600 hover:to-blue-600 text-white rounded-full px-5 py-3 flex items-center shadow-lg gap-2 transition-transform hover:scale-105"
               title="Start Session"
               onClick={() => {
                 setIsOpen(false);
@@ -67,7 +67,7 @@ export const FloatingActionButton = () => {
             </button>
             <Link
               to="/log"
-              className="bg-white hover:bg-gray-50 text-gray-700 rounded-full px-4 py-3 flex items-center shadow-lg gap-2 transition-transform hover:scale-105"
+              className="bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:from-green-500 hover:to-green-700 text-white rounded-full px-5 py-3 flex items-center shadow-lg gap-2 transition-transform hover:scale-105"
               title="Log Climb"
               onClick={() => setIsOpen(false)}
             >
@@ -78,7 +78,7 @@ export const FloatingActionButton = () => {
         )}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-primary-600 hover:bg-primary-700 text-white w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+          className="bg-gradient-to-br from-primary-600 via-blue-600 to-cyan-400 hover:from-primary-700 hover:to-blue-700 text-white w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110"
           title="Actions"
         >
           <span className="text-2xl">{isOpen ? "×" : "+"}</span>
@@ -90,7 +90,7 @@ export const FloatingActionButton = () => {
         {isOpen && (
           <>
             <button
-              className="bg-white hover:bg-gray-50 text-gray-700 rounded-full px-4 py-3 flex items-center shadow-lg gap-2 transition-transform hover:scale-105"
+              className="bg-gradient-to-r from-primary-500 via-primary-600 to-blue-500 hover:from-primary-600 hover:to-blue-600 text-white rounded-full px-5 py-3 flex items-center shadow-lg gap-2 transition-transform hover:scale-105"
               title="Start Session"
               onClick={() => {
                 setIsOpen(false);
@@ -102,7 +102,7 @@ export const FloatingActionButton = () => {
             </button>
             <Link
               to="/log"
-              className="bg-white hover:bg-gray-50 text-gray-700 rounded-full px-4 py-3 flex items-center shadow-lg gap-2 transition-transform hover:scale-105"
+              className="bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:from-green-500 hover:to-green-700 text-white rounded-full px-5 py-3 flex items-center shadow-lg gap-2 transition-transform hover:scale-105"
               title="Log Climb"
               onClick={() => setIsOpen(false)}
             >
@@ -113,7 +113,7 @@ export const FloatingActionButton = () => {
         )}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-primary-600 hover:bg-primary-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+          className="bg-gradient-to-br from-primary-600 via-blue-600 to-cyan-400 hover:from-primary-700 hover:to-blue-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-transform hover:scale-110"
           title="Actions"
         >
           <span className="text-2xl">{isOpen ? "×" : "+"}</span>

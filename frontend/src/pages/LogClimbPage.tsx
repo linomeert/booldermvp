@@ -1,4 +1,5 @@
 import { useState, FormEvent, useEffect } from "react";
+import catGif from "../assets/cat.gif";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as api from "../api";
@@ -702,7 +703,11 @@ export const LogClimbPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full">
             <div className="text-center">
-              <div className="text-5xl mb-4">✓</div>
+              <img
+                src={catGif}
+                alt="Cat celebrating"
+                className="mx-auto mb-4 w-32 h-32 object-contain rounded-lg shadow"
+              />
               <h3 className="text-xl font-bold text-gray-900 mb-2">
                 Climb Logged!
               </h3>
