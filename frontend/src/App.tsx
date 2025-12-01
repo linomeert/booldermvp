@@ -63,7 +63,7 @@ function AppRoutes() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-r from-[#cc2b5e] to-[#753a88] ">
       {user && <Navbar />}
       <div className={user ? "pb-16 md:pb-0" : ""}>
         <Routes>

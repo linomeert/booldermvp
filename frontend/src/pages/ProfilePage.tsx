@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as api from "../api";
 import { useAuth } from "../context/AuthContext";
 import { ProfileHeader } from "../components/ProfileHeader";
+import { EditProfileModal } from "../components/EditProfileModal";
 import { Tabs } from "../components/Tabs";
 import { ClimbCard } from "../components/ClimbCard";
 import { ProjectCard } from "../components/ProjectCard";
@@ -18,6 +19,7 @@ export const ProfilePage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("tops");
+  const [editOpen, setEditOpen] = useState(false);
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ["user", username],
@@ -142,7 +144,11 @@ export const ProfilePage = () => {
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
       <div className="mb-6">
-        <ProfileHeader user={user} isOwnProfile={isOwnProfile} />
+        <ProfileHeader
+          user={user}
+          isOwnProfile={isOwnProfile}
+          onEditProfile={() => setEditOpen(true)}
+        />
         {!isOwnProfile && (
           <div className="mt-4">
             <button
@@ -169,6 +175,32 @@ export const ProfilePage = () => {
           </div>
         )}
       </div>
+      {isOwnProfile && (
+        <EditProfileModal
+          user={user}
+          isOpen={editOpen}
+          onClose={() => setEditOpen(false)}
+          onSave={async (formData) => {
+            try {
+              // Only handle avatar upload for now
+              const updated = await api.updateProfileAvatar(formData);
+              // Optimistically update avatarUrl in cache
+              queryClient.setQueryData(["user", user.username], (old: any) =>
+                old ? { ...old, avatarUrl: updated.avatarUrl } : old
+              );
+              queryClient.setQueryData(["me"], (old: any) =>
+                old ? { ...old, avatarUrl: updated.avatarUrl } : old
+              );
+            } catch (e) {
+              // Optionally show error
+              // eslint-disable-next-line no-alert
+              alert((e as Error).message);
+            } finally {
+              setEditOpen(false);
+            }
+          }}
+        />
+      )}
 
       <div className="mt-8">
         <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab}>
@@ -183,7 +215,7 @@ export const ProfilePage = () => {
                   />
                 ))
               ) : (
-                <div className="col-span-full text-center text-gray-600 py-12">
+                <div className="col-span-full text-center text-white py-12">
                   No tops yet
                 </div>
               )}

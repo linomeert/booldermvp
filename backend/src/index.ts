@@ -21,6 +21,9 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+// Serve uploaded avatars statically
+import path from 'path';
+app.use('/uploads/avatars', express.static(path.join(__dirname, '../uploads/avatars')));
 
 // Health check
 app.get('/health', (_req, res) => {

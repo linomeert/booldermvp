@@ -1,3 +1,21 @@
+// Update profile avatar (multipart/form-data)
+export const updateProfileAvatar = async (formData: FormData): Promise<User> => {
+  const token = localStorage.getItem('authToken');
+  const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/users/me/avatar`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: token ? `Bearer ${token}` : '',
+    },
+    body: formData,
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to update avatar');
+  }
+  const data = await res.json();
+  // The backend returns { avatarUrl }, so merge with previous user data if needed
+  return { avatarUrl: data.avatarUrl } as User;
+};
 import { apiGet, apiPost, apiPatch, apiDelete } from './client';
 import type {
   User,

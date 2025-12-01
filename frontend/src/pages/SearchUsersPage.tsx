@@ -98,7 +98,7 @@ export const SearchUsersPage = () => {
       <div className="mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="text-primary-600 hover:text-primary-700 mb-4 flex items-center"
+          className="text-white hover:text-primary-700 mb-4 flex items-center"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -115,7 +115,7 @@ export const SearchUsersPage = () => {
           Back
         </button>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Search Users</h1>
+        <h1 className="text-3xl font-bold text-white mb-4">Search Users</h1>
 
         <div className="relative">
           <input
@@ -141,11 +141,11 @@ export const SearchUsersPage = () => {
       </div>
 
       {searchQuery.length < 2 ? (
-        <div className="text-center text-gray-600 py-12">
+        <div className="text-center text-white py-12">
           Enter at least 2 characters to search
         </div>
       ) : isLoading ? (
-        <div className="text-center text-gray-600 py-12">Searching...</div>
+        <div className="text-center text-white py-12">Searching...</div>
       ) : searchResults && searchResults.length > 0 ? (
         <div className="space-y-3">
           {searchResults.map((user: User) => (

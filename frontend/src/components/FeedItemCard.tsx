@@ -1,7 +1,9 @@
+
 import { Climb } from "../types";
 import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteClimb } from "../api";
+import { Avatar } from "./Avatar";
 
 interface FeedItemCardProps {
   climb: Climb;
@@ -46,12 +48,8 @@ export const FeedItemCard = ({
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="p-4">
         <div className="flex items-center space-x-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
-            <img
-              src={`https://avatar.iran.liara.run/public?username=${climb.user?.username}`}
-              alt={climb.user?.name}
-              className="w-full h-full rounded-full object-cover"
-            />
+          <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
+            <Avatar src={climb.user?.avatarUrl} username={climb.user?.username} alt={climb.user?.name} size={40} />
           </div>
           <div className="flex-1">
             <Link

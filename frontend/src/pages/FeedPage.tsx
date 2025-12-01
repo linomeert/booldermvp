@@ -4,6 +4,7 @@ import { FeedItemCard } from "../components/FeedItemCard";
 import { SessionCard } from "../components/SessionCard";
 import { FloatingActionButton } from "../components/FloatingActionButton";
 import type { Climb, Session } from "../types";
+import { useAuth } from "../context/AuthContext";
 
 type FeedItem =
   | { type: "climb"; data: Climb }
@@ -19,6 +20,8 @@ export const FeedPage = () => {
     queryKey: ["feed-sessions"],
     queryFn: api.getFeedSessions,
   });
+
+  const { user: currentUser } = useAuth();
 
   const isLoading = climbsLoading || sessionsLoading;
 
@@ -57,14 +60,14 @@ export const FeedPage = () => {
   if (isLoading) {
     return (
       <div className="max-w-2xl mx-auto py-8 px-4">
-        <div className="text-center text-gray-600">Loading feed...</div>
+        <div className="text-center text-white">Loading feed...</div>
       </div>
     );
   }
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Recent Activity</h1>
+      <h1 className="text-3xl font-bold text-white mb-8">{`Hey ${currentUser?.username}, here's what happened:`}</h1>
 
       <div className="space-y-6">
         {feedItems.length > 0 ? (

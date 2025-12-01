@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Session } from "../types";
+import { Avatar } from "./Avatar";
 import {
   deleteSession,
   deleteClimb,
@@ -223,13 +224,12 @@ export const SessionCard = ({
               className="flex items-center space-x-3 mb-2 hover:opacity-80 transition-opacity"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
-                <img
-                  src={`https://avatar.iran.liara.run/public?username=${session.user.username}`}
-                  alt={session.user.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <Avatar
+                src={session.user.avatarUrl}
+                username={session.user.username}
+                alt={session.user.name}
+                size={40}
+              />
               <div>
                 <div className="font-semibold text-gray-900">
                   {session.user.name}
@@ -476,26 +476,67 @@ export const SessionCard = ({
 
       {/* Fistbump button */}
       <div className="px-6 pb-4 pt-3 border-t">
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsBuzzing(true);
-            fistbumpMutation.mutate(session.id);
-            setTimeout(() => setIsBuzzing(false), 500);
-          }}
-          disabled={fistbumpMutation.isPending}
-          className={`flex items-center gap-2 transition-colors ${
-            hasFistbumped
-              ? "text-orange-600"
-              : "text-gray-500 hover:text-orange-600"
-          }`}
-        >
-          <span className="text-2xl">👊</span>
-          <span className="font-medium text-sm">
-            {session.fistbumpCount || 0}
-          </span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsBuzzing(true);
+              fistbumpMutation.mutate(session.id);
+              setTimeout(() => setIsBuzzing(false), 500);
+            }}
+            disabled={fistbumpMutation.isPending}
+            className={`flex items-center gap-2 transition-colors ${
+              hasFistbumped
+                ? "text-orange-600"
+                : "text-gray-500 hover:text-orange-600"
+            }`}
+          >
+            <span className="text-2xl">👊</span>
+            <span className="font-medium text-sm">
+              {session.fistbumpCount || 0}
+            </span>
+          </button>
+          {/* Fistbump Avatars */}
+          {Array.isArray(session.fistbumps) && session.fistbumps.length > 0 && (
+            <div className="flex -space-x-2 ml-2">
+              {session.fistbumps
+                .slice(0, 5)
+                .map((fistbumpUser: any, idx: number) => {
+                  // If backend populates with user objects, use avatarUrl/username, else fallback to id
+                  const username =
+                    typeof fistbumpUser === "object" && fistbumpUser.username
+                      ? fistbumpUser.username
+                      : fistbumpUser;
+                  console.log("ICI");
+                  console.log(fistbumpUser);
+                  console.log(session.fistbumps);
+                  console.log(fistbumpUser?.avatarUrl);
+                  return (
+                    <Link
+                      to={`/profile/${username}`}
+                      key={username || idx}
+                      className="block w-7 h-7 rounded-full border-2 border-white shadow-sm bg-primary-100 overflow-hidden"
+                      style={{ zIndex: 10 - idx }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Avatar
+                        src={fistbumpUser?.avatarUrl}
+                        username={username}
+                        alt={username}
+                        size={30}
+                      />
+                    </Link>
+                  );
+                })}
+              {session.fistbumps.length > 5 && (
+                <span className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 text-xs font-semibold border-2 border-white">
+                  +{session.fistbumps.length - 5}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {climbs.length > 0 && (
@@ -735,7 +776,7 @@ export const SessionCard = ({
                         >
                           <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
                             <img
-                              src={`https://avatar.iran.liara.run/public?username=${comment.user?.username}`}
+                              src={`${comment.user?.avatarUrl}`}
                               alt={comment.user?.name}
                               className="w-full h-full object-cover"
                             />

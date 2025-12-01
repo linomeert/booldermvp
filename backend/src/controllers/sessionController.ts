@@ -143,6 +143,7 @@ export const getMySessions = async (
       .populate('gymId')
       .populate('cragId')
       .populate('participants', 'name username avatarUrl')
+      .populate('fistbumps', 'name username avatarUrl')
       .lean();
 
     // Fetch climbs for each session
@@ -198,6 +199,7 @@ export const getUserSessions = async (
       .populate('gymId')
       .populate('cragId')
       .populate('participants', 'name username avatarUrl')
+      .populate('fistbumps', 'name username avatarUrl')
       .lean();
 
     // Fetch climbs for each session
@@ -262,6 +264,7 @@ export const getFeedSessions = async (
       .populate('gymId')
       .populate('cragId')
       .populate('participants', 'name username avatarUrl')
+      .populate('fistbumps', 'name username avatarUrl')
       .lean();
 
     // Fetch climbs for each session
@@ -310,6 +313,7 @@ export const getSessionById = async (
       .populate('cragId')
       .populate('userId', 'name username avatarUrl')
       .populate('participants', 'name username avatarUrl')
+      .populate('fistbumps', 'name username avatarUrl')
       .lean();
 
     if (!session) {

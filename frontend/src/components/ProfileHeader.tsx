@@ -1,20 +1,23 @@
+
 import { User } from "../types";
+import { Avatar } from "./Avatar";
 
 interface ProfileHeaderProps {
   user: User;
   isOwnProfile?: boolean;
+  onEditProfile?: () => void;
 }
 
-export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
+export const ProfileHeader = ({
+  user,
+  isOwnProfile,
+  onEditProfile,
+}: ProfileHeaderProps) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-start space-x-6">
-        <div className="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-          <img
-            src={`https://avatar.iran.liara.run/public?username=${user.username}`}
-            alt={user.name}
-            className="w-full h-full rounded-full object-cover"
-          />
+        <div className="w-24 h-24 flex items-center justify-center flex-shrink-0 overflow-hidden">
+          <Avatar src={user.avatarUrl} username={user.username} alt={user.name} size={96} />
         </div>
 
         <div className="flex-1">
@@ -22,7 +25,10 @@ export const ProfileHeader = ({ user, isOwnProfile }: ProfileHeaderProps) => {
           <p className="text-gray-600 mt-1">@{user.username}</p>
 
           {isOwnProfile && (
-            <button className="mt-4 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+            <button
+              className="mt-4 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              onClick={onEditProfile}
+            >
               Edit Profile
             </button>
           )}
