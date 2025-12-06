@@ -9,8 +9,6 @@ import { Tabs } from "../components/Tabs";
 import { ClimbCard } from "../components/ClimbCard";
 import { ProjectCard } from "../components/ProjectCard";
 import { SessionCard } from "../components/SessionCard";
-import { StatsView } from "../components/StatsView";
-import { CoachView } from "../components/CoachView";
 import type { User } from "../types";
 
 export const ProfilePage = () => {
@@ -54,17 +52,14 @@ export const ProfilePage = () => {
   const { data: allClimbs } = useQuery({
     queryKey: ["allClimbs", user?.id],
     queryFn: () => api.getMyClimbs({}),
-    enabled: !!user && (activeTab === "stats" || activeTab === "coach"),
+    enabled: !!user,
   });
 
   const { data: sessions } = useQuery({
     queryKey: ["sessions", username],
     queryFn: () =>
       isOwnProfile ? api.getMySessions() : api.getUserSessions(username!),
-    enabled:
-      !!user &&
-      !!username &&
-      (activeTab === "sessions" || activeTab === "coach"),
+    enabled: !!user && !!username && activeTab === "sessions",
   });
 
   const { data: friends } = useQuery({
@@ -116,21 +111,12 @@ export const ProfilePage = () => {
   const isFriend = friendshipStatus?.isFriend || false;
   const isPending = friendshipStatus?.status === "pending";
 
-  const tabs = isOwnProfile
-    ? [
-        { id: "tops", label: "Tops" },
-        { id: "projects", label: "Projects" },
-        { id: "sessions", label: "Sessions" },
-        { id: "coach", label: "Coach" },
-        { id: "stats", label: "Stats" },
-        { id: "friends", label: "Friends" },
-      ]
-    : [
-        { id: "tops", label: "Tops" },
-        { id: "projects", label: "Projects" },
-        { id: "sessions", label: "Sessions" },
-        { id: "friends", label: "Friends" },
-      ];
+  const tabs = [
+    { id: "tops", label: "Tops" },
+    { id: "projects", label: "Projects" },
+    { id: "sessions", label: "Sessions" },
+    { id: "friends", label: "Friends" },
+  ];
 
   const handleFriendAction = () => {
     if (isPending) return; // Don't allow action if pending
@@ -257,31 +243,6 @@ export const ProfilePage = () => {
               )}
             </div>
           )}
-
-          {activeTab === "coach" && (
-            <div>
-              {allClimbs && sessions ? (
-                <CoachView climbs={allClimbs} sessions={sessions} />
-              ) : (
-                <div className="text-center text-gray-600 py-12">
-                  Loading coach insights...
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "stats" && (
-            <div>
-              {allClimbs && allClimbs.length > 0 ? (
-                <StatsView climbs={allClimbs} />
-              ) : (
-                <div className="text-center text-gray-600 py-12">
-                  No climbing data yet
-                </div>
-              )}
-            </div>
-          )}
-
           {activeTab === "friends" && (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {friends && friends.length > 0 ? (

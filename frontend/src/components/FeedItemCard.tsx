@@ -1,4 +1,3 @@
-
 import { Climb } from "../types";
 import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -49,7 +48,12 @@ export const FeedItemCard = ({
       <div className="p-4">
         <div className="flex items-center space-x-3 mb-3">
           <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
-            <Avatar src={climb.user?.avatarUrl} username={climb.user?.username} alt={climb.user?.name} size={40} />
+            <Avatar
+              src={climb.user?.avatarUrl}
+              username={climb.user?.username}
+              alt={climb.user?.name}
+              size={40}
+            />
           </div>
           <div className="flex-1">
             <Link

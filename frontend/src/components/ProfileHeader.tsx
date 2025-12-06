@@ -1,4 +1,3 @@
-
 import { User } from "../types";
 import { Avatar } from "./Avatar";
 
@@ -17,7 +16,12 @@ export const ProfileHeader = ({
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-start space-x-6">
         <div className="w-24 h-24 flex items-center justify-center flex-shrink-0 overflow-hidden">
-          <Avatar src={user.avatarUrl} username={user.username} alt={user.name} size={96} />
+          <Avatar
+            src={user.avatarUrl}
+            username={user.username}
+            alt={user.name}
+            size={96}
+          />
         </div>
 
         <div className="flex-1">
