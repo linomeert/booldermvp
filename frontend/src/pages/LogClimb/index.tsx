@@ -1,10 +1,12 @@
-import { useState, FormEvent, useEffect } from "react";
-import catGif from "../assets/cat.gif";
+import { useState, FormEvent, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import * as api from "../api";
-import type { ClimbStatus, LocationType } from "../types";
-import { useAuth } from "../context/AuthContext";
+import * as api from "../../api";
+import type { ClimbStatus, LocationType } from "../../types";
+import { useAuth } from "../../context/AuthContext";
+import { GradeSelector } from "./GradeSelector";
+import { SuccessModal } from "./SuccessModal";
+import { updateForm, type FormData } from "./updateForm";
 
 export const LogClimbPage = () => {
   const navigate = useNavigate();
@@ -18,7 +20,8 @@ export const LogClimbPage = () => {
   const [climberId, setClimberId] = useState<string>("");
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
     status: "top" as ClimbStatus,
     locationType: "indoor" as LocationType,
     gymId: "",
@@ -30,64 +33,6 @@ export const LogClimbPage = () => {
     notes: "",
     sessionId: sessionIdFromUrl || "",
   });
-
-  // Grade options
-  const usGrades = [
-    "V0",
-    "V1",
-    "V2",
-    "V3",
-    "V4",
-    "V5",
-    "V6",
-    "V7",
-    "V8",
-    "V9",
-    "V10",
-    "V11",
-    "V12",
-    "V13",
-    "V14",
-    "V15",
-    "V16",
-    "V17",
-  ];
-  const frGrades = [
-    "3",
-    "4",
-    "4+",
-    "5",
-    "5+",
-    "6A",
-    "6A+",
-    "6B",
-    "6B+",
-    "6C",
-    "6C+",
-    "7A",
-    "7A+",
-    "7B",
-    "7B+",
-    "7C",
-    "7C+",
-    "8A",
-    "8A+",
-    "8B",
-    "8B+",
-    "8C",
-    "8C+",
-    "9A",
-  ];
-  const colors = [
-    "White",
-    "Yellow",
-    "Orange",
-    "Green",
-    "Blue",
-    "Red",
-    "Purple",
-    "Black",
-  ];
 
   const { data: gyms } = useQuery({
     queryKey: ["gyms"],
@@ -151,8 +96,6 @@ export const LogClimbPage = () => {
       }
     }
   }, [currentSession, user]);
-
-  const [showSuccess, setShowSuccess] = useState(false);
 
   const createClimbMutation = useMutation({
     mutationFn: api.createClimb,
@@ -225,11 +168,10 @@ export const LogClimbPage = () => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const activeSessions = sessions?.filter((s) => !s.endedAt) || [];
-
-  // Debug logging
-  console.log("Sessions data:", sessions);
-  console.log("Active sessions:", activeSessions);
+  const activeSessions = useMemo(
+    () => sessions?.filter((s) => !s.endedAt) || [],
+    [sessions]
+  );
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center md:justify-center z-50">
@@ -265,7 +207,9 @@ export const LogClimbPage = () => {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, status: "top" })}
+                onClick={() =>
+                  setFormData(updateForm(formData, { status: "top" }))
+                }
                 className={`py-3 px-4 rounded-2xl font-medium transition-colors ${
                   formData.status === "top"
                     ? "bg-green-600 text-white"
@@ -276,7 +220,9 @@ export const LogClimbPage = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, status: "project" })}
+                onClick={() =>
+                  setFormData(updateForm(formData, { status: "project" }))
+                }
                 className={`py-3 px-4 rounded-2xl font-medium transition-colors ${
                   formData.status === "project"
                     ? "bg-amber-600 text-white"
@@ -325,12 +271,13 @@ export const LogClimbPage = () => {
                 <select
                   value={formData.locationType}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      locationType: e.target.value as LocationType,
-                      gymId: "",
-                      cragId: "",
-                    })
+                    setFormData(
+                      updateForm(formData, {
+                        locationType: e.target.value as LocationType,
+                        gymId: "",
+                        cragId: "",
+                      })
+                    )
                   }
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
                 >
@@ -347,7 +294,9 @@ export const LogClimbPage = () => {
                   <select
                     value={formData.gymId}
                     onChange={(e) =>
-                      setFormData({ ...formData, gymId: e.target.value })
+                      setFormData(
+                        updateForm(formData, { gymId: e.target.value })
+                      )
                     }
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
                   >
@@ -367,7 +316,9 @@ export const LogClimbPage = () => {
                   <select
                     value={formData.cragId}
                     onChange={(e) =>
-                      setFormData({ ...formData, cragId: e.target.value })
+                      setFormData(
+                        updateForm(formData, { cragId: e.target.value })
+                      )
                     }
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
                   >
@@ -387,150 +338,15 @@ export const LogClimbPage = () => {
             <label className="block text-base font-semibold text-gray-900 mb-3">
               Grade *
             </label>
-            {customGrading && customGrading.length > 0 ? (
-              <div className="grid grid-cols-7 gap-2 py-2">
-                {customGrading.map((grade) => {
-                  // Map color names to tailwind classes
-                  const colorMap: Record<string, string> = {
-                    white: "bg-white border-2 border-gray-300",
-                    yellow: "bg-yellow-400",
-                    orange: "bg-orange-500",
-                    green: "bg-green-600",
-                    blue: "bg-blue-600",
-                    red: "bg-red-600",
-                    purple: "bg-purple-600",
-                    black: "bg-gray-900",
-                    pink: "bg-pink-600",
-                  };
-                  const colorKey = grade.toLowerCase();
-                  return (
-                    <button
-                      key={grade}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, grade })}
-                      className={`flex items-center justify-center w-8 h-8 rounded-full shadow-md transition-all border-2
-                        ${
-                          formData.grade === grade
-                            ? "ring-2 ring-primary-600 ring-offset-1 scale-110"
-                            : "hover:scale-105"
-                        }
-                        ${colorMap[colorKey] || "bg-gray-200"}`}
-                      aria-label={grade}
-                    >
-                      {/* No text, just color */}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <>
-                {/* Grade Type Tabs */}
-                <div className="flex border-b border-gray-200 mb-3">
-                  <button
-                    type="button"
-                    onClick={() => setGradeType("us")}
-                    className={`px-4 py-2 font-medium transition-colors ${
-                      gradeType === "us"
-                        ? "text-primary-600 border-b-2 border-primary-600"
-                        : "text-gray-600 hover:text-gray-900"
-                    }`}
-                  >
-                    US (V-Scale)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setGradeType("fr")}
-                    className={`px-4 py-2 font-medium transition-colors ${
-                      gradeType === "fr"
-                        ? "text-primary-600 border-b-2 border-primary-600"
-                        : "text-gray-600 hover:text-gray-900"
-                    }`}
-                  >
-                    FR (Fontainebleau)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setGradeType("color")}
-                    className={`px-4 py-2 font-medium transition-colors ${
-                      gradeType === "color"
-                        ? "text-primary-600 border-b-2 border-primary-600"
-                        : "text-gray-600 hover:text-gray-900"
-                    }`}
-                  >
-                    Color
-                  </button>
-                </div>
-
-                {/* Grade Selection */}
-                <div className="grid grid-cols-6 gap-2">
-                  {gradeType === "us" &&
-                    usGrades.map((grade) => (
-                      <button
-                        key={grade}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, grade })}
-                        className={`py-3 px-2 rounded-lg font-semibold transition-all ${
-                          formData.grade === grade
-                            ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                      >
-                        {grade}
-                      </button>
-                    ))}
-                  {gradeType === "fr" &&
-                    frGrades.map((grade) => (
-                      <button
-                        key={grade}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, grade })}
-                        className={`py-3 px-2 rounded-lg font-semibold transition-all ${
-                          formData.grade === grade
-                            ? "bg-primary-600 text-white ring-2 ring-primary-600 ring-offset-2"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        }`}
-                      >
-                        {grade}
-                      </button>
-                    ))}
-                  {gradeType === "color" &&
-                    colors.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        onClick={() =>
-                          setFormData({ ...formData, grade: color })
-                        }
-                        className="p-2 transition-all flex items-center justify-center"
-                      >
-                        <div
-                          className={`w-14 h-14 rounded-full shadow-md transition-all ${
-                            formData.grade === color
-                              ? "ring-4 ring-primary-600 ring-offset-2 scale-110"
-                              : "hover:scale-105"
-                          } ${
-                            color === "White"
-                              ? "bg-white border-2 border-gray-300"
-                              : color === "Yellow"
-                              ? "bg-yellow-400"
-                              : color === "Orange"
-                              ? "bg-orange-500"
-                              : color === "Green"
-                              ? "bg-green-600"
-                              : color === "Blue"
-                              ? "bg-blue-600"
-                              : color === "Red"
-                              ? "bg-red-600"
-                              : color === "Purple"
-                              ? "bg-purple-600"
-                              : "bg-gray-900"
-                          }`}
-                        />
-                      </button>
-                    ))}
-                </div>
-              </>
-            )}
+            <GradeSelector
+              gradeType={gradeType}
+              onGradeTypeChange={setGradeType}
+              selectedGrade={formData.grade}
+              onGradeSelect={(grade) =>
+                setFormData(updateForm(formData, { grade }))
+              }
+              customGrading={customGrading}
+            />
             {!formData.grade && (
               <p className="mt-2 text-sm text-red-600">Please select a grade</p>
             )}
@@ -545,7 +361,7 @@ export const LogClimbPage = () => {
                 type="text"
                 value={formData.style}
                 onChange={(e) =>
-                  setFormData({ ...formData, style: e.target.value })
+                  setFormData(updateForm(formData, { style: e.target.value }))
                 }
                 placeholder="e.g., flash, onsight"
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700 placeholder:text-gray-400"
@@ -561,7 +377,7 @@ export const LogClimbPage = () => {
                 min="1"
                 value={formData.attempts}
                 onChange={(e) =>
-                  setFormData({ ...formData, attempts: e.target.value })
+                  setFormData(updateForm(formData, { notes: e.target.value }))
                 }
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
               />
@@ -576,7 +392,9 @@ export const LogClimbPage = () => {
               <select
                 value={formData.sessionId}
                 onChange={(e) =>
-                  setFormData({ ...formData, sessionId: e.target.value })
+                  setFormData(
+                    updateForm(formData, { mediaUrl: e.target.value })
+                  )
                 }
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
               >
@@ -699,37 +517,16 @@ export const LogClimbPage = () => {
       </div>
 
       {/* Success Modal */}
-      {showSuccess && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full">
-            <div className="text-center">
-              <img
-                src={catGif}
-                alt="Cat celebrating"
-                className="mx-auto mb-4 w-32 h-32 object-contain rounded-lg shadow"
-              />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Climb Logged!
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Your climb has been successfully logged.
-              </p>
-              <button
-                onClick={() => {
-                  if (sessionIdFromUrl) {
-                    navigate(`/sessions/${sessionIdFromUrl}`);
-                  } else {
-                    navigate("/");
-                  }
-                }}
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-md font-medium transition-colors"
-              >
-                Continue
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SuccessModal
+        isOpen={showSuccess}
+        onContinue={() => {
+          if (sessionIdFromUrl) {
+            navigate(`/sessions/${sessionIdFromUrl}`);
+          } else {
+            navigate("/");
+          }
+        }}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
-export type ClimbStatus = 'top' | 'project';
-export type LocationType = 'indoor' | 'outdoor';
+export type ClimbStatus = "top" | "project";
+export type LocationType = "indoor" | "outdoor";
 
 export interface User {
   id: string;
@@ -90,7 +90,7 @@ export interface Comment {
 export interface Notification {
   id: string;
   userId: string;
-  type: 'friend_request' | 'fistbump' | 'comment';
+  type: "friend_request" | "fistbump" | "comment";
   fromUserId: string;
   fromUser?: User;
   sessionId?: string;

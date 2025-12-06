@@ -4,13 +4,13 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Navbar } from "./components/Navbar";
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
-import { RegisterPage } from "./pages/RegisterPage";
+import { RegisterPage } from "./pages/Register";
 import { FeedPage } from "./pages/FeedPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { SessionDetailPage } from "./pages/SessionDetailPage";
 import StartSessionPage from "./pages/StartSessionPage";
-import { LogClimbPage } from "./pages/LogClimbPage";
-import { ClimbDetailPage } from "./pages/ClimbDetailPage";
+import { LogClimbPage } from "./pages/LogClimb";
+import { ClimbDetailPage } from "./pages/ClimbDetail";
 import { SearchUsersPage } from "./pages/SearchUsersPage";
 import NotificationsPage from "./pages/NotificationsPage";
 

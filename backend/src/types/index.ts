@@ -1,5 +1,5 @@
-export type ClimbStatus = 'top' | 'project';
-export type LocationType = 'indoor' | 'outdoor';
+export type ClimbStatus = "top" | "project";
+export type LocationType = "indoor" | "outdoor";
 
 export interface User {
   id: string;
@@ -43,7 +43,16 @@ export interface Session {
   topsCount: number;
   projectsCount: number;
   hardestGrade?: string;
+  rating?: number;
+  feeling?: string;
   syncedToStrava: boolean;
+  fistbumps: string[];
+  fistbumpCount: number;
+  participants: string[] | User[];
+  user?: User;
+  gym?: Gym;
+  crag?: Crag;
+  climbs?: Climb[];
 }
 
 export interface FeedItem {

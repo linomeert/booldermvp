@@ -1,94 +1,42 @@
-import { useQuery } from "@tanstack/react-query";
-import * as api from "../api";
+import { useAuth } from "../context/AuthContext";
 import { FeedItemCard } from "../components/FeedItemCard";
 import { SessionCard } from "../components/SessionCard";
 import { FloatingActionButton } from "../components/FloatingActionButton";
-import type { Climb, Session } from "../types";
-import { useAuth } from "../context/AuthContext";
-
-type FeedItem =
-  | { type: "climb"; data: Climb }
-  | { type: "session"; data: Session };
+import { useFeed } from "../hooks/useFeed";
 
 export const FeedPage = () => {
-  const { data: climbs, isLoading: climbsLoading } = useQuery({
-    queryKey: ["feed"],
-    queryFn: api.getFeed,
-  });
+  const { user } = useAuth();
+  const { feedItems, isLoading, error } = useFeed();
 
-  const { data: sessions, isLoading: sessionsLoading } = useQuery({
-    queryKey: ["feed-sessions"],
-    queryFn: api.getFeedSessions,
-  });
-
-  const { user: currentUser } = useAuth();
-
-  const isLoading = climbsLoading || sessionsLoading;
-
-  // Merge and sort climbs and sessions by date
-  const feedItems: FeedItem[] = [];
-
-  // Get session IDs to filter out climbs that are part of sessions
-  const sessionIds = new Set(sessions?.map((s) => s.id) || []);
-
-  if (climbs) {
-    // Only show climbs that are NOT part of a session
-    climbs.forEach((climb) => {
-      if (!climb.sessionId || !sessionIds.has(climb.sessionId)) {
-        feedItems.push({ type: "climb", data: climb });
-      }
-    });
-  }
-
-  if (sessions) {
-    // Show all sessions (both active and completed)
-    sessions.forEach((session) => {
-      feedItems.push({ type: "session", data: session });
-    });
-  }
-
-  feedItems.sort((a, b) => {
-    const dateA = new Date(
-      a.type === "climb" ? a.data.createdAt : a.data.endedAt || a.data.startedAt
-    ).getTime();
-    const dateB = new Date(
-      b.type === "climb" ? b.data.createdAt : b.data.endedAt || b.data.startedAt
-    ).getTime();
-    return dateB - dateA;
-  });
-
-  if (isLoading) {
+  if (isLoading)
     return (
-      <div className="max-w-2xl mx-auto py-8 px-4">
-        <div className="text-center text-white">Loading feed...</div>
+      <div className="max-w-2xl mx-auto py-8 px-4 text-white text-center">
+        Loading…
       </div>
     );
-  }
+  if (error) return <div>Could not load feed.</div>;
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-white mb-8">{`Hey ${currentUser?.username}, here's what happened:`}</h1>
+      <h1 className="text-3xl font-bold text-white mb-8">
+        {`Hey ${user?.username}, here's what happened:`}
+      </h1>
 
       <div className="space-y-6">
-        {feedItems.length > 0 ? (
+        {feedItems.length ? (
           feedItems.map((item) =>
             item.type === "climb" ? (
-              <FeedItemCard
-                key={`climb-${item.data.id}`}
-                climb={item.data}
-                showDelete={false}
-              />
+              <FeedItemCard key={`climb-${item.data.id}`} climb={item.data} />
             ) : (
               <SessionCard
                 key={`session-${item.data.id}`}
                 session={item.data}
-                showDelete={false}
               />
             )
           )
         ) : (
-          <div className="text-center text-gray-600 py-12">
-            No activity yet. Start logging climbs or sessions!
+          <div className="text-center text-gray-500 py-12">
+            No activity yet.
           </div>
         )}
       </div>

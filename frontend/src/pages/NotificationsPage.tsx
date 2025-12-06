@@ -11,42 +11,62 @@ import {
 import type { Notification } from "../types";
 import { formatDistanceToNow } from "date-fns";
 
+const getNotificationMessage = (notification: Notification) => {
+  const username = notification.fromUser?.username || "Someone";
+  switch (notification.type) {
+    case "friend_request":
+      return `${username} wants to add you as a friend`;
+    case "fistbump":
+      return `${username} fistbumped your session`;
+    case "comment":
+      return `${username} commented on your session`;
+    default:
+      return "New notification";
+  }
+};
+
+const getNotificationLink = (notification: Notification) => {
+  if (notification.sessionId) return `/sessions/${notification.sessionId}`;
+  return null;
+};
+
 export default function NotificationsPage() {
   const queryClient = useQueryClient();
 
-  const { data: notifications = [], isLoading } = useQuery({
+  const invalidateNotifications = () =>
+    queryClient.invalidateQueries({ queryKey: ["notifications"] });
+
+  const {
+    data: notifications = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["notifications"],
     queryFn: getNotifications,
   });
 
   const markAsReadMutation = useMutation({
     mutationFn: markNotificationAsRead,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    onSuccess: invalidateNotifications,
   });
 
   const markAllReadMutation = useMutation({
     mutationFn: markAllNotificationsAsRead,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    onSuccess: invalidateNotifications,
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteNotification,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
+    onSuccess: invalidateNotifications,
   });
 
   const acceptFriendMutation = useMutation({
     mutationFn: (friendId: string) => acceptFriendRequest(friendId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      invalidateNotifications();
       queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
-    onError: (error) => {
+    onError: (error: unknown) => {
       console.error("Accept friend error:", error);
       alert("Failed to accept friend request. Please try again.");
     },
@@ -55,10 +75,10 @@ export default function NotificationsPage() {
   const rejectFriendMutation = useMutation({
     mutationFn: (friendId: string) => rejectFriendRequest(friendId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      invalidateNotifications();
       queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
-    onError: (error) => {
+    onError: (error: unknown) => {
       console.error("Reject friend error:", error);
       alert("Failed to reject friend request. Please try again.");
     },
@@ -82,31 +102,20 @@ export default function NotificationsPage() {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const getNotificationMessage = (notification: Notification) => {
-    const username = notification.fromUser?.username || "Someone";
-    switch (notification.type) {
-      case "friend_request":
-        return `${username} wants to add you as a friend`;
-      case "fistbump":
-        return `${username} fistbumped your session`;
-      case "comment":
-        return `${username} commented on your session`;
-      default:
-        return "New notification";
-    }
-  };
-
-  const getNotificationLink = (notification: Notification) => {
-    if (notification.sessionId) {
-      return `/sessions/${notification.sessionId}`;
-    }
-    return null;
-  };
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="max-w-2xl mx-auto p-4">
+        <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+          Failed to load notifications. Please try again.
+        </div>
       </div>
     );
   }
@@ -119,8 +128,9 @@ export default function NotificationsPage() {
           <button
             onClick={() => markAllReadMutation.mutate()}
             className="text-sm text-blue-600 hover:text-blue-700"
+            disabled={markAllReadMutation.isPending}
           >
-            Mark all as read
+            {markAllReadMutation.isPending ? "Marking..." : "Mark all as read"}
           </button>
         )}
       </div>
@@ -131,110 +141,132 @@ export default function NotificationsPage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {notifications.map((notification) => (
-            <div
-              key={notification.id}
-              className={`bg-white rounded-lg p-4 shadow ${
-                !notification.read ? "border-l-4 border-blue-600" : ""
-              }`}
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <Link
-                    to={`/profile/${notification.fromUser?.username}`}
-                    className="flex items-center gap-3 mb-2 hover:opacity-80 transition-opacity"
-                  >
-                    <img
-                      src={`https://avatar.iran.liara.run/public?username=${notification.fromUser?.username}`}
-                      alt={notification.fromUser?.username}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        {getNotificationMessage(notification)}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {formatDistanceToNow(new Date(notification.createdAt), {
-                          addSuffix: true,
-                        })}
-                      </p>
-                    </div>
-                  </Link>
+          {notifications.map((notification) => {
+            const link = getNotificationLink(notification);
+            const fromUser = notification.fromUser;
 
-                  {notification.type === "friend_request" && (
-                    <div className="flex gap-2 mt-3">
-                      <button
-                        onClick={() => handleAcceptFriend(notification)}
-                        disabled={
-                          acceptFriendMutation.isPending ||
-                          rejectFriendMutation.isPending
-                        }
-                        className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            return (
+              <div
+                key={notification.id}
+                className={`bg-white rounded-lg p-4 shadow ${
+                  !notification.read ? "border-l-4 border-blue-600" : ""
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    {fromUser ? (
+                      <Link
+                        to={`/profile/${fromUser.username}`}
+                        className="flex items-center gap-3 mb-2 hover:opacity-80 transition-opacity"
                       >
-                        {acceptFriendMutation.isPending
-                          ? "Accepting..."
-                          : "Accept"}
-                      </button>
-                      <button
-                        onClick={() => handleDenyFriend(notification)}
-                        disabled={
-                          acceptFriendMutation.isPending ||
-                          rejectFriendMutation.isPending
-                        }
-                        className="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {rejectFriendMutation.isPending ? "Denying..." : "Deny"}
-                      </button>
-                    </div>
-                  )}
+                        <img
+                          src={`https://avatar.iran.liara.run/public?username=${fromUser.username}`}
+                          alt={fromUser.username}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">
+                            {getNotificationMessage(notification)}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatDistanceToNow(
+                              new Date(notification.createdAt),
+                              { addSuffix: true }
+                            )}
+                          </p>
+                        </div>
+                      </Link>
+                    ) : (
+                      <div className="mb-2">
+                        <p className="text-sm font-medium">
+                          {getNotificationMessage(notification)}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {formatDistanceToNow(
+                            new Date(notification.createdAt),
+                            { addSuffix: true }
+                          )}
+                        </p>
+                      </div>
+                    )}
 
-                  {notification.type !== "friend_request" && (
-                    <div className="flex gap-2 mt-3">
-                      {getNotificationLink(notification) && (
-                        <Link
-                          to={getNotificationLink(notification)!}
-                          className="text-sm text-blue-600 hover:text-blue-700"
-                          onClick={() =>
-                            !notification.read &&
-                            handleMarkAsRead(notification.id)
-                          }
-                        >
-                          View
-                        </Link>
-                      )}
-                      {!notification.read && (
+                    {notification.type === "friend_request" && (
+                      <div className="flex gap-2 mt-3">
                         <button
-                          onClick={() => handleMarkAsRead(notification.id)}
-                          className="text-sm text-gray-600 hover:text-gray-700"
+                          onClick={() => handleAcceptFriend(notification)}
+                          disabled={
+                            acceptFriendMutation.isPending ||
+                            rejectFriendMutation.isPending
+                          }
+                          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Mark as read
+                          {acceptFriendMutation.isPending
+                            ? "Accepting..."
+                            : "Accept"}
                         </button>
-                      )}
-                    </div>
-                  )}
-                </div>
+                        <button
+                          onClick={() => handleDenyFriend(notification)}
+                          disabled={
+                            acceptFriendMutation.isPending ||
+                            rejectFriendMutation.isPending
+                          }
+                          className="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {rejectFriendMutation.isPending
+                            ? "Denying..."
+                            : "Deny"}
+                        </button>
+                      </div>
+                    )}
 
-                <button
-                  onClick={() => handleDelete(notification.id)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    {notification.type !== "friend_request" && (
+                      <div className="flex gap-2 mt-3">
+                        {link && (
+                          <Link
+                            to={link}
+                            className="text-sm text-blue-600 hover:text-blue-700"
+                            onClick={() =>
+                              !notification.read &&
+                              handleMarkAsRead(notification.id)
+                            }
+                          >
+                            View
+                          </Link>
+                        )}
+                        {!notification.read && (
+                          <button
+                            onClick={() => handleMarkAsRead(notification.id)}
+                            className="text-sm text-gray-600 hover:text-gray-700"
+                          >
+                            Mark as read
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => handleDelete(notification.id)}
+                    className="text-gray-400 hover:text-gray-600"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
