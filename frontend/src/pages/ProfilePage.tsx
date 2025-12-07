@@ -107,7 +107,7 @@ export const ProfilePage = () => {
 
       <div className="mt-8">
         <Tabs
-          tabs={PROFILE_TABS}
+          tabs={[...PROFILE_TABS]}
           activeTab={activeTab}
           onTabChange={(tabId) => setActiveTab(tabId as ProfileTabId)}
         >
