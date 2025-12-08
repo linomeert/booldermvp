@@ -4,6 +4,7 @@
   "description": "Fullstack climbing logging application",
   "scripts": {
     "setup": "./setup.sh",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "install:all": "npm run install:backend && npm run install:frontend",
@@ -12,7 +13,19 @@
     "build:backend": "cd backend && npm run build",
     "build:frontend": "cd frontend && npm run build"
   },
-  "keywords": ["climbing", "fullstack", "express", "react", "typescript"],
+  "keywords": [
+    "climbing",
+    "fullstack",
+    "express",
+    "react",
+    "typescript"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "vite-plugin-svgr": "^4.5.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }

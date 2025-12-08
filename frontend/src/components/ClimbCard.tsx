@@ -109,27 +109,6 @@ export const ClimbCard = ({
         </button>
       )}
 
-      <div className="p-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">
-            {climb.gym?.name || climb.crag?.name || "Unknown location"}
-          </span>
-          <span className="text-xs text-gray-500">
-            {climb.locationType === "indoor" ? "🏢" : "⛰️"}
-          </span>
-        </div>
-        {climb.climberId && typeof climb.climberId === "object" && (
-          <div className="mt-2 flex items-center gap-1">
-            <span className="text-xs font-medium text-primary-600">
-              {climb.climberId.name}
-            </span>
-          </div>
-        )}
-        {climb.style && (
-          <div className="mt-2 text-xs text-gray-500">{climb.style}</div>
-        )}
-      </div>
-
       {/* Quick Log Buttons for Projects in Active Sessions */}
       {showQuickLog && sessionId && onQuickLog && (
         <div className="flex gap-2 px-4 pb-3">

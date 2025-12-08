@@ -7,7 +7,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/Register";
 import { FeedPage } from "./pages/FeedPage";
 import { ProfilePage } from "./pages/ProfilePage";
-import { SessionDetailPage } from "./pages/SessionDetailPage";
+import { SessionDetailPage } from "./pages/SessionDetail";
 import StartSessionPage from "./pages/StartSessionPage";
 import { LogClimbPage } from "./pages/LogClimb";
 import { ClimbDetailPage } from "./pages/ClimbDetail";
@@ -47,7 +47,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+        <div className="text-white">Loading...</div>
       </div>
     );
   }
@@ -63,7 +63,7 @@ function AppRoutes() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-[#cc2b5e] to-[#753a88] ">
+    <div className="min-h-screen bg-[#151920]">
       {user && <Navbar />}
       <div className={user ? "pb-16 md:pb-0" : ""}>
         <Routes>

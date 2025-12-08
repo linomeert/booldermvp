@@ -1,22 +1,29 @@
 // Update profile avatar (multipart/form-data)
-export const updateProfileAvatar = async (formData: FormData): Promise<User> => {
-  const token = localStorage.getItem('authToken');
-  const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/users/me/avatar`, {
-    method: 'PATCH',
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-    body: formData,
-  });
+export const updateProfileAvatar = async (
+  formData: FormData
+): Promise<User> => {
+  const token = localStorage.getItem("authToken");
+  const res = await fetch(
+    `${
+      import.meta.env.VITE_API_URL || "http://localhost:3001"
+    }/api/users/me/avatar`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: formData,
+    }
+  );
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
-    throw new Error(error.error || 'Failed to update avatar');
+    throw new Error(error.error || "Failed to update avatar");
   }
   const data = await res.json();
   // The backend returns { avatarUrl }, so merge with previous user data if needed
   return { avatarUrl: data.avatarUrl } as User;
 };
-import { apiGet, apiPost, apiPatch, apiDelete } from './client';
+import { apiGet, apiPost, apiPatch, apiDelete } from "./client";
 import type {
   User,
   Climb,
@@ -28,7 +35,7 @@ import type {
   AuthResponse,
   CreateClimbRequest,
   CreateSessionRequest,
-} from '../types';
+} from "../types";
 
 // Auth
 export const register = (data: {
@@ -36,13 +43,13 @@ export const register = (data: {
   password: string;
   name: string;
   username: string;
-}) => apiPost<AuthResponse>('/auth/register', data);
+}) => apiPost<AuthResponse>("/auth/register", data);
 
 export const login = (data: { email: string; password: string }) =>
-  apiPost<AuthResponse>('/auth/login', data);
+  apiPost<AuthResponse>("/auth/login", data);
 
 // Users
-export const getMe = () => apiGet<User>('/users/me');
+export const getMe = () => apiGet<User>("/users/me");
 export const getUserByUsername = (username: string) =>
   apiGet<User>(`/users/${username}`);
 export const searchUsers = (query: string) =>
@@ -50,20 +57,27 @@ export const searchUsers = (query: string) =>
 
 // Climbs
 export const createClimb = (data: CreateClimbRequest) =>
-  apiPost<Climb>('/climbs', data);
+  apiPost<Climb>("/climbs", data);
 export const getMyClimbs = (params?: {
   status?: string;
   locationType?: string;
 }) => {
-  const query = new URLSearchParams(params as Record<string, string>).toString();
-  return apiGet<Climb[]>(`/climbs/me${query ? `?${query}` : ''}`);
+  const query = new URLSearchParams(
+    params as Record<string, string>
+  ).toString();
+  return apiGet<Climb[]>(`/climbs/me${query ? `?${query}` : ""}`);
 };
-export const getUserClimbs = (username: string, params?: {
-  status?: string;
-  locationType?: string;
-}) => {
-  const query = new URLSearchParams(params as Record<string, string>).toString();
-  return apiGet<Climb[]>(`/climbs/user/${username}${query ? `?${query}` : ''}`);
+export const getUserClimbs = (
+  username: string,
+  params?: {
+    status?: string;
+    locationType?: string;
+  }
+) => {
+  const query = new URLSearchParams(
+    params as Record<string, string>
+  ).toString();
+  return apiGet<Climb[]>(`/climbs/user/${username}${query ? `?${query}` : ""}`);
 };
 export const getClimbById = (id: string) => apiGet<Climb>(`/climbs/${id}`);
 export const deleteClimb = (id: string) =>
@@ -71,30 +85,35 @@ export const deleteClimb = (id: string) =>
 
 // Sessions
 export const createSession = (data: CreateSessionRequest) =>
-  apiPost<Session>('/sessions', data);
-export const endSession = (id: string, data?: { rating?: number; feeling?: string }) =>
-  apiPatch<Session>(`/sessions/${id}/end`, data || {});
-export const getMySessions = () => apiGet<Session[]>('/sessions/me');
+  apiPost<Session>("/sessions", data);
+export const endSession = (
+  id: string,
+  data?: { rating?: number; feeling?: string }
+) => apiPatch<Session>(`/sessions/${id}/end`, data || {});
+export const getMySessions = () => apiGet<Session[]>("/sessions/me");
 export const getUserSessions = (username: string) =>
   apiGet<Session[]>(`/sessions/user/${username}`);
-export const getFeedSessions = () => apiGet<Session[]>('/sessions/feed');
+export const getFeedSessions = () => apiGet<Session[]>("/sessions/feed");
 export const getSessionById = (id: string) =>
   apiGet<Session>(`/sessions/${id}`);
 export const deleteSession = (id: string) =>
   apiDelete<{ message: string }>(`/sessions/${id}`);
 export const fistbumpSession = (id: string) =>
-  apiPost<{ fistbumped: boolean; fistbumpCount: number }>(`/sessions/${id}/fistbump`, {});
+  apiPost<{ fistbumped: boolean; fistbumpCount: number }>(
+    `/sessions/${id}/fistbump`,
+    {}
+  );
 export const addParticipant = (sessionId: string, friendId: string) =>
   apiPost<Session>(`/sessions/${sessionId}/participants`, { friendId });
 export const removeParticipant = (sessionId: string, friendId: string) =>
   apiDelete<Session>(`/sessions/${sessionId}/participants/${friendId}`);
 
 // Feed
-export const getFeed = () => apiGet<Climb[]>('/feed');
+export const getFeed = () => apiGet<Climb[]>("/feed");
 
 // Locations
-export const getGyms = () => apiGet<Gym[]>('/locations/gyms');
-export const getCrags = () => apiGet<Crag[]>('/locations/crags');
+export const getGyms = () => apiGet<Gym[]>("/locations/gyms");
+export const getCrags = () => apiGet<Crag[]>("/locations/crags");
 
 // Friends
 export const addFriend = (friendId: string) =>
@@ -105,9 +124,11 @@ export const rejectFriendRequest = (friendId: string) =>
   apiPost<{ message: string }>(`/friends/${friendId}/reject`, {});
 export const removeFriend = (friendId: string) =>
   apiDelete<{ message: string }>(`/friends/${friendId}`);
-export const getFriends = () => apiGet<User[]>('/friends');
+export const getFriends = () => apiGet<User[]>("/friends");
 export const checkFriendship = (friendId: string) =>
-  apiGet<{ isFriend: boolean; status: string | null }>(`/friends/check/${friendId}`);
+  apiGet<{ isFriend: boolean; status: string | null }>(
+    `/friends/check/${friendId}`
+  );
 
 // Comments
 export const getSessionComments = (sessionId: string) =>
@@ -118,40 +139,53 @@ export const deleteComment = (commentId: string) =>
   apiDelete<{ message: string }>(`/comments/${commentId}`);
 
 // Notifications
-export const getNotifications = () =>
-  apiGet<Notification[]>('/notifications');
+export const getNotifications = () => apiGet<Notification[]>("/notifications");
 export const markNotificationAsRead = (id: string) =>
   apiPatch<Notification>(`/notifications/${id}/read`);
 export const markAllNotificationsAsRead = () =>
-  apiPatch<{ count: number }>('/notifications/read-all');
+  apiPatch<{ count: number }>("/notifications/read-all");
 export const deleteNotification = (id: string) =>
   apiDelete<{ message: string }>(`/notifications/${id}`);
 
 // Uploads
 export const uploadImage = async (file: File): Promise<{ url: string }> => {
   const formData = new FormData();
-  formData.append('image', file);
+  formData.append("image", file);
 
-  const token = localStorage.getItem('authToken');
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+  const token = localStorage.getItem("authToken");
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
-  if (!token || token === 'null') {
-    throw new Error('No authentication token found. Please log in again.');
+  if (!token || token === "null") {
+    throw new Error("No authentication token found. Please log in again.");
   }
 
-  const response = await fetch(`${API_URL}/api/uploads/image`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  });
+  try {
+    const response = await fetch(`${API_URL}/api/uploads/image`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    console.error('Upload error:', error);
-    throw new Error(error.message || 'Failed to upload image');
+    if (!response.ok) {
+      let errorMessage = "Failed to upload image";
+      try {
+        const error = await response.json();
+        errorMessage = error.message || error.error || errorMessage;
+      } catch {
+        errorMessage = `Upload failed with status ${response.status}`;
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    if (!data.url) {
+      throw new Error("No URL returned from server");
+    }
+    return data;
+  } catch (error) {
+    console.error("Upload error:", error);
+    throw error;
   }
-
-  return response.json();
 };

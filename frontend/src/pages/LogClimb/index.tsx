@@ -158,7 +158,9 @@ export const LogClimbPage = () => {
       setImages((prev) => [...prev, ...urls]);
     } catch (error) {
       console.error("Failed to upload images:", error);
-      alert("Failed to upload images. Please try again.");
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      alert(`Failed to upload images: ${errorMessage}`);
     } finally {
       setUploading(false);
     }
@@ -377,7 +379,9 @@ export const LogClimbPage = () => {
                 min="1"
                 value={formData.attempts}
                 onChange={(e) =>
-                  setFormData(updateForm(formData, { notes: e.target.value }))
+                  setFormData(
+                    updateForm(formData, { attempts: e.target.value })
+                  )
                 }
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white text-gray-700"
               />

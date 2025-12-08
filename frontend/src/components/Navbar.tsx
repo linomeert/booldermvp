@@ -32,14 +32,13 @@ export const Navbar = () => {
   return (
     <>
       {/* Desktop Top Nav */}
-      <nav className="hidden md:block bg-white shadow-md">
+      <nav className="hidden md:block bg-[#1e252e] shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-gray-900 alfa-font">
-                  Bldr
-                </span>
+                <Logo />
+                <span className="text-xl font-bold text-white ">Boolder</span>
               </Link>
             </div>
 
@@ -128,11 +127,11 @@ export const Navbar = () => {
       </nav>
 
       {/* Mobile Top Bar */}
-      <div className="md:hidden bg-white shadow-md">
+      <div className="md:hidden bg-[#1e252e] shadow-md">
         <div className="px-4 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
             <Logo />
-            <span className="text-xl alfa-font text-gray-900">Bldr</span>
+            <span className="text-lg text-white">Boolder</span>
           </Link>
           {user && (
             <button
@@ -160,7 +159,7 @@ export const Navbar = () => {
 
       {/* Mobile Bottom Nav */}
       {user && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1e252e] border-t border-gray-700 z-50 text-white">
           <div className="grid grid-cols-4 h-16">
             <Link
               to="/"
@@ -184,7 +183,6 @@ export const Navbar = () => {
                   d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                 />
               </svg>
-              <span className="text-xs font-medium">Feed</span>
             </Link>
 
             <Link
@@ -209,7 +207,6 @@ export const Navbar = () => {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-              <span className="text-xs font-medium">Search</span>
             </Link>
 
             <Link
@@ -241,7 +238,6 @@ export const Navbar = () => {
                   </span>
                 )}
               </div>
-              <span className="text-xs font-medium">Alerts</span>
             </Link>
 
             <Link
@@ -266,7 +262,6 @@ export const Navbar = () => {
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <span className="text-xs font-medium">Profile</span>
             </Link>
           </div>
         </nav>
